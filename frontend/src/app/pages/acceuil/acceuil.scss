@@ -1,0 +1,108 @@
+.content-wrapper {
+  padding-top: 70px;
+  width: 100%;
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+
+/** Bannière impossible à rater : beaucoup d'utilisateurs ne voient pas la page /dashboard */
+.home-dash-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 2px solid #34d399;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+}
+
+.home-dash-banner__text {
+  flex: 1 1 220px;
+  font-size: 0.95rem;
+  color: #064e3b;
+  line-height: 1.4;
+}
+
+.home-dash-banner__btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.35rem;
+  background: #059669;
+  color: #fff !important;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
+  transition: transform 0.12s, background 0.12s;
+
+  &:hover {
+    background: #047857;
+    transform: translateY(-1px);
+  }
+}
+
+.banner-wrapper {
+  width: calc(100% + 4rem);
+  margin-left: -2rem;
+  margin-right: -2rem;
+  margin-bottom: -50px;
+}
+
+.main-layout {
+  display: flex;
+  gap: 1.5rem;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.cards-section {
+  flex: 1;
+  min-width: 0;
+  overflow-x: hidden;
+  max-width: calc(100% - 400px);
+}
+
+.leaderboard-section {
+  display: block;
+  flex: 0 0 370px;
+  width: 370px;
+  margin-left: auto;
+}
+
+@media (max-width: 1400px) {
+  .main-layout {
+    flex-direction: column;
+  }
+
+  .cards-section {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .leaderboard-section {
+    width: 100%;
+    margin-left: 0;
+    flex: 1;
+  }
+}
+
+@media (min-width: 1400px) {
+  .leaderboard-section {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding-top: 0;
+    padding-bottom: 70px;
+  }
+}

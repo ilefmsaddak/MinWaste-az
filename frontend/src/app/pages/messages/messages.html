@@ -1,0 +1,80 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="messages-page">
+  <aside class="conversation-list-panel">
+    <header class="panel-header">
+      <h1>Messages</h1>
+      <p>
+        User #{{ currentUserId }}
+        <span class="connection-pill" [class.online]="isConnected">{{ isConnected ? 'Connected' : 'Disconnected' }}</span>
+      </p>
+    </header>
+
+    @if (isLoadingConversations) {
+      <p class="panel-info">Loading conversations...</p>
+    } @else if (conversations.length === 0) {
+      <p class="panel-info">No conversations yet. Use “Contact owner” from an annonce.</p>
+    } @else {
+      <ul class="conversation-list">
+        @for (conversation of conversations; track conversation.id) {
+          <li>
+            <button
+              type="button"
+              class="conversation-btn"
+              [class.active]="selectedConversationId === conversation.id"
+              (click)="selectConversation(conversation)"
+            >
+              <div class="conversation-top-row">
+                <strong>{{ conversation.otherParticipant.displayName }}</strong>
+                <span>{{ conversation.updatedAt | date: 'shortTime' }}</span>
+              </div>
+              <p>
+                {{ conversation.lastMessage?.text || 'Start this conversation' }}
+              </p>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </aside>
+
+  <section class="chat-panel">
+    @if (pageError()) {
+      <div class="error-banner">{{ pageError() }}</div>
+    }
+
+    @if (!selectedConversation) {
+      <div class="empty-chat">Select a conversation to start messaging.</div>
+    } @else {
+      <header class="chat-header">
+        <h2>{{ selectedConversation.otherParticipant.displayName }}</h2>
+        <p>Private conversation</p>
+      </header>
+
+      <div class="messages-list">
+        @if (isLoadingMessages) {
+          <p class="panel-info">Loading messages...</p>
+        } @else if (messages.length === 0) {
+          <p class="panel-info">No messages yet. Say hello 👋</p>
+        } @else {
+          @for (message of messages; track message.id) {
+            <article class="message-item" [class.mine]="isMine(message)">
+              <p>{{ message.text }}</p>
+              <span>{{ asDate(message.createdAt) | date: 'short' }}</span>
+            </article>
+          }
+        }
+      </div>
+
+      <form class="message-form" (submit)="sendMessage($event)">
+        <input
+          type="text"
+          placeholder="Write a message"
+          [value]="messageInput()"
+          (input)="updateMessageInput($any($event.target).value)"
+        />
+        <button type="submit">Send</button>
+      </form>
+    }
+  </section>
+</div>

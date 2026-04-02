@@ -1,0 +1,162 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="buy-page">
+  <aside class="filters-panel">
+    <div class="filters-header">
+      <h2>Filters</h2>
+      <button type="button" class="reset-btn" (click)="resetFilters()">Reset</button>
+    </div>
+
+    <section class="filter-group">
+      <h3>Availability</h3>
+      @for (option of availabilityOptions; track option.value) {
+        <label class="filter-option">
+          <input
+            type="checkbox"
+            [checked]="selectedAvailability.includes(option.value)"
+            (change)="toggleAvailability(option.value, $any($event.target).checked)"
+          />
+          <span>{{ option.label }}</span>
+        </label>
+      }
+    </section>
+
+    <section class="filter-group">
+      <h3>Price Type</h3>
+      @for (option of priceTypeOptions; track option.value) {
+        <label class="filter-option">
+          <input
+            type="checkbox"
+            [checked]="selectedPriceTypes.includes(option.value)"
+            (change)="togglePriceType(option.value, $any($event.target).checked)"
+          />
+          <span>{{ option.label }}</span>
+        </label>
+      }
+    </section>
+
+    <section class="filter-group">
+      <h3>Price Range (DT)</h3>
+      <div class="price-range">
+        <input
+          type="number"
+          min="0"
+          placeholder="Min"
+          [value]="minPrice ?? ''"
+          (input)="onMinPriceChange($any($event.target).value)"
+        />
+        <input
+          type="number"
+          min="0"
+          placeholder="Max"
+          [value]="maxPrice ?? ''"
+          (input)="onMaxPriceChange($any($event.target).value)"
+        />
+      </div>
+    </section>
+
+    <section class="filter-group">
+      <h3>Time</h3>
+      <label class="filter-option">
+        <input type="radio" name="timeFilter" [checked]="timeFilter === 'any'" (change)="onTimeFilterChange('any')" />
+        <span>Any time</span>
+      </label>
+      <label class="filter-option">
+        <input type="radio" name="timeFilter" [checked]="timeFilter === '24h'" (change)="onTimeFilterChange('24h')" />
+        <span>Last 24 hours</span>
+      </label>
+      <label class="filter-option">
+        <input type="radio" name="timeFilter" [checked]="timeFilter === '3d'" (change)="onTimeFilterChange('3d')" />
+        <span>Last 3 days</span>
+      </label>
+      <label class="filter-option">
+        <input type="radio" name="timeFilter" [checked]="timeFilter === '7d'" (change)="onTimeFilterChange('7d')" />
+        <span>Last 7 days</span>
+      </label>
+    </section>
+
+    <section class="filter-group">
+      <h3>Place</h3>
+      <input
+        type="text"
+        placeholder="Enter city or address"
+        [value]="placeQuery"
+        (input)="onPlaceChange($any($event.target).value)"
+      />
+    </section>
+  </aside>
+
+  <main class="products-panel">
+    <div class="products-header">
+      <h1>Buy Products</h1>
+      <span class="results-count">{{ filteredAnnonces.length }} products</span>
+    </div>
+
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Search products by title, category, description or place"
+        [value]="searchQuery"
+        (input)="onSearchChange($any($event.target).value)"
+      />
+    </div>
+
+    @if (isLoading) {
+      <div class="status-message">Loading products...</div>
+    } @else if (error) {
+      <div class="status-message error">{{ error }}</div>
+    } @else if (filteredAnnonces.length === 0) {
+      <div class="status-message">No products match your selected filters.</div>
+    } @else {
+      <div class="products-grid">
+        @for (annonce of filteredAnnonces; track annonce.id) {
+          <article class="product-card" (click)="openAnnonce(annonce)">
+            <div class="product-image">
+              <img [src]="getPhotoUrl(annonce.photos)" [alt]="annonce.title" />
+              <span class="status-badge" [ngClass]="'status-' + getEffectiveStatus(annonce)">
+                {{ getStatusLabel(getEffectiveStatus(annonce)) }}
+              </span>
+            </div>
+
+            <div class="product-content">
+              <div class="product-category">{{ annonce.category }}</div>
+              <h3 class="product-title">{{ annonce.title }}</h3>
+
+              <div class="seller-row">
+                <div class="seller-avatar">{{ getSellerInitial(annonce.owner?.displayName) }}</div>
+                <div class="seller-meta">
+                  <p class="seller-name">{{ annonce.owner?.displayName || ('Owner #' + annonce.ownerId) }}</p>
+                  <div class="seller-rating">
+                    <span class="rating-value">{{ getSellerTrustFormatted(annonce.owner?.trustScore) }}/5</span>
+                    <span class="rating-stars" aria-hidden="true">
+                      @for (star of getSellerTrustStarIcons(annonce.owner?.trustScore); track $index) {
+                        <span [class.filled]="star !== '☆'">{{ star }}</span>
+                      }
+                    </span>
+                    <span class="rating-count">(trust)</span>
+                  </div>
+                </div>
+              </div>
+
+              @if (annonce.location) {
+                <p class="product-location">📍 {{ annonce.location.addr }}</p>
+              }
+
+              <div class="product-footer">
+                @if (annonce.priceType === 'free') {
+                  <span class="price-free">Free</span>
+                } @else {
+                  <div class="price-info">
+                    <span class="price-amount">{{ annonce.priceAmount | number: '1.2-2' }} DT</span>
+                    <span class="price-type">{{ getPriceLabel(annonce.priceType) }}</span>
+                  </div>
+                }
+                <span class="product-time">{{ getTimeAgo(annonce.createdAt) }}</span>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </main>
+</div>

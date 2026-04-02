@@ -1,0 +1,147 @@
+.banner-wrapper {
+  position: relative;
+  margin-bottom: 4rem;
+}
+
+.banner {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: visible;
+  border-radius: 8px;
+
+  @media (max-width: 768px) {
+    height: 200px;
+  }
+
+  .banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 8px;
+  }
+
+  .banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    border-radius: 8px;
+  }
+
+  .banner-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
+    max-width: 800px;
+
+    @media (max-width: 768px) {
+      font-size: 1.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 1.25rem;
+    }
+  }
+
+  .banner-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.95);
+    background-color: #1d3124;
+    border-radius: 30px;
+    padding: 0.5rem 1.5rem;
+    margin: 0;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+    max-width: 700px;
+
+    @media (max-width: 768px) {
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+.filter {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: 90%;
+  max-width: 500px;
+
+ 
+}
+
+.filter-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  flex-wrap: nowrap;
+
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 500;
+  font-size: 0.9rem;
+  white-space: nowrap;
+
+  &:hover {
+    background: #1d3124;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &.active {
+    background: #1d3124;
+    color: white;
+  }
+}
+
+.filter-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+
+}
+
+

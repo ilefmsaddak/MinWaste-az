@@ -1,0 +1,417 @@
+.admin-gamification {
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+
+  .page-header {
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2.5rem;
+      color: #2c3e50;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: #7f8c8d;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+    }
+  }
+
+  .stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    .stat-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+      }
+
+      .stat-icon {
+        font-size: 2.5rem;
+      }
+
+      .stat-content {
+        h3 {
+          margin: 0;
+          font-size: 0.9rem;
+          color: #7f8c8d;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .stat-number {
+          margin: 0.5rem 0 0 0;
+          font-size: 2rem;
+          font-weight: 700;
+          color: #2c3e50;
+        }
+      }
+    }
+  }
+
+  .tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    .tab-btn {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      background: transparent;
+      color: #7f8c8d;
+      cursor: pointer;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #f8f9fa;
+        color: #667eea;
+      }
+
+      &.active {
+        background: #667eea;
+        color: white;
+      }
+    }
+  }
+
+  .tab-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    h2 {
+      color: #2c3e50;
+      margin-top: 0;
+      font-size: 1.5rem;
+    }
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+
+    .overview-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 2rem;
+      border-radius: 12px;
+      color: white;
+
+      h3 {
+        margin-top: 0;
+        font-size: 1.3rem;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+    }
+  }
+
+  .badges-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h2 {
+      margin: 0;
+    }
+
+    .btn-add-badge {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+    }
+  }
+
+  .badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+
+    .badge-card {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      border: 2px solid #ecf0f1;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: #667eea;
+        box-shadow: 0 8px 15px rgba(102, 126, 234, 0.2);
+      }
+
+      .badge-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      h3 {
+        margin: 0 0 0.5rem 0;
+        color: #2c3e50;
+        font-size: 1.1rem;
+      }
+
+      .badge-description {
+        color: #7f8c8d;
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+      }
+
+      .badge-info {
+        background: white;
+        padding: 0.8rem;
+        border-radius: 8px;
+        width: 100%;
+        margin-bottom: 1rem;
+
+        .info-row {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.85rem;
+          padding: 0.4rem 0;
+
+          .label {
+            font-weight: 600;
+            color: #2c3e50;
+          }
+
+          .value {
+            color: #667eea;
+            font-weight: 700;
+          }
+        }
+      }
+
+      .badge-actions {
+        display: flex;
+        gap: 0.5rem;
+        width: 100%;
+
+        .action-btn {
+          flex: 1;
+          padding: 0.6rem;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 0.85rem;
+          font-weight: 600;
+          transition: all 0.3s ease;
+
+          &.edit-btn {
+            background: #e3f2fd;
+            color: #1976d2;
+
+            &:hover {
+              background: #bbdefb;
+            }
+          }
+
+          &.delete-btn {
+            background: #ffebee;
+            color: #c62828;
+
+            &:hover {
+              background: #ffcdd2;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .leaderboard-table-container {
+    overflow-x: auto;
+    margin-top: 1rem;
+
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        background: #f8f9fa;
+        border-bottom: 2px solid #ecf0f1;
+
+        th {
+          padding: 1rem;
+          text-align: left;
+          font-weight: 600;
+          color: #2c3e50;
+          font-size: 0.9rem;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+      }
+
+      tbody {
+        tr {
+          border-bottom: 1px solid #ecf0f1;
+          transition: background 0.3s ease;
+
+          &:hover {
+            background: #f8f9fa;
+          }
+
+          &.top-rank {
+            background: #fffbea;
+          }
+
+          td {
+            padding: 1rem;
+            color: #2c3e50;
+
+            &.rank-cell {
+              font-weight: 700;
+              font-size: 1.1rem;
+
+              .medal {
+                font-size: 1.5rem;
+              }
+
+              .rank-number {
+                color: #7f8c8d;
+              }
+            }
+
+            &.user-name {
+              font-weight: 600;
+            }
+
+            &.points {
+              color: #667eea;
+              font-weight: 700;
+            }
+
+            &.badges {
+              color: #f5576c;
+              font-weight: 600;
+            }
+
+            &.level {
+              .level-badge {
+                padding: 0.4rem 0.8rem;
+                border-radius: 15px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                display: inline-block;
+
+                &.level-diamond {
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  color: white;
+                }
+
+                &.level-platinum {
+                  background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%);
+                  color: white;
+                }
+
+                &.level-gold {
+                  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+                  color: #333;
+                }
+
+                &.level-silver {
+                  background: linear-gradient(135deg, #e8e8e8 0%, #c0c0c0 100%);
+                  color: #333;
+                }
+
+                &.level-bronze {
+                  background: linear-gradient(135deg, #cd7f32 0%, #b87333 100%);
+                  color: white;
+                }
+
+                &.level-beginner {
+                  background: #ecf0f1;
+                  color: #7f8c8d;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .loading {
+    background: white;
+    padding: 3rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 1.1rem;
+    color: #7f8c8d;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-gamification {
+    padding: 1rem;
+
+    .page-header h1 {
+      font-size: 1.8rem;
+    }
+
+    .tabs {
+      flex-wrap: wrap;
+
+      .tab-btn {
+        flex: 1;
+        min-width: 120px;
+      }
+    }
+
+    .badges-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .leaderboard-table-container {
+      .leaderboard-table {
+        font-size: 0.9rem;
+
+        thead th,
+        tbody td {
+          padding: 0.8rem 0.6rem;
+        }
+      }
+    }
+  }
+}

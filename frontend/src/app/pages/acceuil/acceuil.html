@@ -1,0 +1,36 @@
+<app-nav-bar></app-nav-bar>
+<div class="content-wrapper">
+  <div class="home-dash-banner" role="region" aria-label="Quick access to gamification">
+    <div class="home-dash-banner__text">
+      <strong>Points, CO₂, leaderboard, points journal</strong> — everything is on the dashboard.
+    </div>
+    <a routerLink="/dashboard" class="home-dash-banner__btn">Open Dashboard</a>
+  </div>
+  
+  <div class="banner-wrapper">
+    <app-banner (filterClick)="onFilterClick($event)"></app-banner>
+  </div>
+  
+  <!-- Recommendations Section -->
+  <app-recommended-items></app-recommended-items>
+  
+  <div class="main-layout">
+    <div class="cards-section">
+      @if (activeSection() === 'for-you') {
+        <app-annonce-cards [sectionTitle]="'For You'" [sectionId]="'for-you-section'"></app-annonce-cards>
+      }
+      @if (activeSection() === 'near-you') {
+        <app-annonce-cards [sectionTitle]="'Near You'" [sectionId]="'near-you-section'"></app-annonce-cards>
+      }
+      @if (activeSection() === 'popular') {
+        <app-annonce-cards [sectionTitle]="'Popular'" [sectionId]="'popular-section'"></app-annonce-cards>
+      }
+      @if (activeSection() === 'just-now') {
+        <app-annonce-cards [sectionTitle]="'Just Now'" [sectionId]="'just-now-section'"></app-annonce-cards>
+      }
+    </div>
+    <div class="leaderboard-section">
+      <app-leaderboard></app-leaderboard>
+    </div>
+  </div>
+</div>

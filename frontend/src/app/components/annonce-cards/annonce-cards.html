@@ -1,0 +1,88 @@
+<div class="cards-container" [id]="sectionId">
+  <h2 class="section-title">{{ sectionTitle }}</h2>
+  
+  @if (isLoading()) {
+    <div class="loading">Loading announcements...</div>
+  } @else if (error()) {
+    <div class="error">{{ error() }}</div>
+  } @else if (annonces().length === 0) {
+    <div class="empty-state">
+      <p class="empty-title">No announcements yet</p>
+      <p class="empty-hint">
+        The list is empty: either there are no items in the database, or the API did not return any.
+        Run the backend on <strong>http://localhost:4000</strong> and add items (e.g. via <strong>Sell</strong>),
+        or check the browser <strong>Network</strong> tab for <code>GET /api/items</code>.
+      </p>
+    </div>
+  } @else {
+    <div class="cards-scroll">
+      @for (annonce of annonces(); track annonce.id) {
+        <div class="card" (click)="openAnnonce(annonce)">
+          <!-- Image -->
+          <div class="card-image">
+            <img
+              [src]="getPhotoUrl(annonce)"
+              (error)="onPhotoError(annonce)"
+              [alt]="annonce.title"
+              loading="lazy"
+            />
+            <span class="status-badge" [ngClass]="'status-' + annonce.status.toLowerCase()">
+              {{ getStatusLabel(annonce.status) }}
+            </span>
+          </div>
+
+          <!-- Card Content -->
+          <div class="card-content">
+            <div class="card-category">{{ annonce.category }}</div>
+            
+            <h3 class="card-title">{{ annonce.title }}</h3>
+
+            <!-- Location -->
+            @if (annonce.location) {
+              <div class="card-location">
+                <span class="location-icon">📍</span>
+                <span class="location-text">{{ annonce.location.addr }}</span>
+              </div>
+            }
+
+            <!-- Expiry Date Warning -->
+            @if (annonce.expiresAt) {
+              <div class="expiry-warning" [ngClass]="{'expiring-soon': isExpiringSoon(annonce.expiresAt), 'expired': isExpired(annonce.expiresAt)}">
+                ⏰ {{ getExpiryLabel(annonce.expiresAt) }}
+              </div>
+            }
+
+            <!-- Quantity Available -->
+            @if (isAvailableForReservation(annonce)) {
+              <div class="quantity-available">
+                ✅ Available: {{ annonce.quantityAvailable ?? annonce.quantity }}
+              </div>
+            } @else {
+              <div class="quantity-unavailable">
+                ❌ Out of Stock
+              </div>
+            }
+
+            <!-- Footer with Price and Time -->
+            <div class="card-footer">
+              <div class="price-section">
+                @if (annonce.priceType === 'free') {
+                  <span class="badge-free">Free</span>
+                } @else {
+                  <div class="price-info">
+                    <span class="price-amount">{{ annonce.priceAmount | number: '1.2-2' }} DT</span>
+                    <span class="price-type">{{ getPriceLabel(annonce.priceType) }}</span>
+                  </div>
+                }
+              </div>
+              <span class="time-ago">{{ getTimeAgo(annonce.createdAt) }}</span>
+            </div>
+
+            <!-- Action Button -->
+            <button class="view-btn" (click)="$event.stopPropagation(); openAnnonce(annonce)">View More</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

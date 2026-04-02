@@ -1,0 +1,62 @@
+<div class="admin-dashboard">
+  <div class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+    <p class="subtitle">Welcome to your administration panel</p>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">Loading dashboard...</div>
+  } @else {
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <h3>Total Users</h3>
+          <p class="stat-number">{{ totalUsers }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <h3>Active Users</h3>
+          <p class="stat-number">{{ activeUsers }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-content">
+          <h3>Suspended Users</h3>
+          <p class="stat-number">{{ suspendedUsers }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📢</div>
+        <div class="stat-content">
+          <h3>Total Announcements</h3>
+          <p class="stat-number">{{ totalAnnouncements }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <h2>Quick Actions</h2>
+      <div class="actions-grid">
+        <a routerLink="/admin/users" class="action-btn action-users">
+          <span class="action-icon">👥</span>
+          <span class="action-text">Manage Users</span>
+        </a>
+        <a routerLink="/admin/announcements" class="action-btn action-announcements">
+          <span class="action-icon">📢</span>
+          <span class="action-text">Manage Announcements</span>
+        </a>
+        <a routerLink="/admin/gamification" class="action-btn action-gamification">
+          <span class="action-icon">🎮</span>
+          <span class="action-text">Gamification</span>
+        </a>
+      </div>
+    </div>
+  }
+</div>

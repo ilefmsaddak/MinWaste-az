@@ -1,0 +1,62 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="notif-page">
+  <header class="notif-hero">
+    <div class="notif-hero__text">
+      <h1>Notifications</h1>
+      <p class="notif-sub">Reservations, messages, badges and reminders related to your announcements.</p>
+    </div>
+    <button
+      type="button"
+      class="notif-btn notif-btn--primary"
+      (click)="markAll()"
+      [disabled]="loading || !items.length"
+    >
+      Mark all as read
+    </button>
+  </header>
+
+  @if (loading) {
+    <div class="notif-loading" aria-busy="true">
+      <div class="notif-spinner"></div>
+      <p>Loading…</p>
+    </div>
+  }
+  @if (error) {
+    <div class="notif-alert">{{ error }}</div>
+    <div class="notif-error-actions">
+      <button type="button" class="notif-btn notif-btn--primary" (click)="load()">Retry</button>
+      <a href="http://localhost:4000/graphql" target="_blank" rel="noopener">Tester le backend GraphQL</a>
+    </div>
+  }
+
+  @if (!loading && !items.length && !error) {
+    <p class="notif-muted">No notifications at the moment.</p>
+  }
+
+  <ul class="notif-list">
+    @for (n of items; track n.id) {
+      <li
+        class="notif-item"
+        [class.notif-item--unread]="!n.isRead"
+        (click)="onNotifClick(n)"
+        role="button"
+        [attr.aria-label]="(n.title || n.type) + ', ' + (n.isRead ? 'lu' : 'non lu')"
+      >
+        <span class="notif-item__accent" aria-hidden="true"></span>
+        <div class="notif-item__main">
+          <div class="notif-item__top">
+            <span class="notif-type">{{ formatNotifType(n.type) }}</span>
+            <time class="notif-date" [attr.datetime]="n.createdAt">{{ n.createdAt | date : 'short' }}</time>
+          </div>
+          <div class="notif-title">{{ n.title || n.type }}</div>
+          <div class="notif-body">{{ n.body }}</div>
+        </div>
+      </li>
+    }
+  </ul>
+
+  <p class="notif-hint">
+    ...
+  </p>
+</div>

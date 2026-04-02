@@ -1,0 +1,37 @@
+<div class="mw-shell">
+  <div class="mw-card">
+    <header class="mw-header">
+      <h1 class="mw-brand">MinWaste</h1>
+      <p class="mw-tagline">Reduce waste, share the future</p>
+    </header>
+
+    <div *ngIf="error" class="mw-alert mw-alert--error">{{ error }}</div>
+
+    <div class="mw-form" style="margin-top: 12px">
+      <div class="mw-field">
+        <label class="mw-label" for="email">Email</label>
+        <input id="email" class="mw-input" [(ngModel)]="email" type="email" placeholder="you@email.com" />
+      </div>
+
+      <div class="mw-field">
+        <label class="mw-label" for="password">Password</label>
+        <input id="password" class="mw-input" [(ngModel)]="password" type="password" placeholder="••••••••" />
+      </div>
+
+      <button class="mw-btn mw-btn--primary" (click)="submit()" [disabled]="loading">
+        {{ loading ? 'Signing in…' : 'Sign in' }}
+      </button>
+
+      <div class="mw-divider">or</div>
+
+      <button class="mw-btn mw-btn--secondary" (click)="google()" [disabled]="loading">
+        Continue with Google
+      </button>
+
+      <div class="mw-links">
+        <a routerLink="/forgot-password">Forgot password?</a>
+        <a routerLink="/register">Create account</a>
+      </div>
+    </div>
+  </div>
+</div>

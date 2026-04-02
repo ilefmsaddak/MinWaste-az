@@ -1,0 +1,176 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="annonce-detail-page">
+  @if (isLoading) {
+    <div class="status-message">Loading annonce details...</div>
+  } @else if (error) {
+    <div class="status-message error">{{ error }}</div>
+  } @else if (annonce) {
+    <article class="post-layout">
+      <main class="post-main">
+        <header class="post-header">
+          <div class="owner-avatar">{{ getOwnerInitial() }}</div>
+          <div class="owner-meta">
+            <p class="owner-name">{{ getOwnerName() }}</p>
+            <p class="post-time">Posted {{ getTimeAgo(annonce.createdAt) }} · {{ annonce.createdAt | date: 'medium' }}</p>
+          </div>
+          <span class="status-chip" [ngClass]="getStatusClass(annonce)">
+            {{ getStatusLabel(getEffectiveStatus(annonce)) }}
+          </span>
+        </header>
+
+        <div
+          class="hero-image-wrap"
+          [style.background-image]="'linear-gradient(135deg, #ecfdf3, #f3f4f6), url(' + getSelectedPhoto() + ')'"
+        >
+          <img [src]="getSelectedPhoto()" [alt]="annonce.title" />
+        </div>
+
+        @if (annonce.photos && annonce.photos.length > 1) {
+          <div class="gallery-strip">
+            @for (photo of annonce.photos; track $index) {
+              <button
+                type="button"
+                class="thumb"
+                [class.active]="selectedPhotoIndex === $index"
+                (click)="selectPhoto($index)"
+              >
+                <img [src]="photo" [alt]="annonce.title + ' photo ' + ($index + 1)" />
+              </button>
+            }
+          </div>
+        }
+
+        <section class="post-content">
+          <p class="category">{{ annonce.category || 'Annonce' }}</p>
+          <h1>{{ annonce.title }}</h1>
+
+          <p class="description">{{ annonce.description || 'No description provided for this annonce.' }}</p>
+
+          <div class="quick-meta">
+            @if (annonce.location?.addr) {
+              <span class="meta-chip">📍 {{ annonce.location?.addr }}</span>
+            }
+            <span class="meta-chip">📦 Total: {{ annonce.quantityTotal }} | Available: {{ annonce.quantityAvailable }}</span>
+            @if (annonce.expiresAt) {
+              <span class="meta-chip">⏳ Expires {{ annonce.expiresAt | date: 'mediumDate' }}</span>
+            }
+          </div>
+        </section>
+      </main>
+
+      <aside class="post-aside">
+        @if (reservationSuccess) {
+          <section class="panel success-panel">
+            <h2>✅ Reservation Successful!</h2>
+            <p>Your reservation has been created. Redirecting to your profile...</p>
+          </section>
+        }
+
+        @if (error && !isLoading) {
+          <section class="panel error-panel">
+            <p class="error-message">{{ error }}</p>
+            @if (showGoToTransactions) {
+              <button type="button" class="btn-contact" (click)="goToTransactions()">
+                Go to Transactions
+              </button>
+            }
+          </section>
+        }
+
+        <section class="panel">
+          <h2>Price & Action</h2>
+          <div class="price-block">
+            @if (annonce.priceType === 'FREE' || annonce.priceType === 'free') {
+              <p class="value">Free</p>
+            } @else {
+              <p class="value">{{ annonce.priceAmount | number: '1.2-2' }} DT</p>
+              <p class="sub">{{ getPriceLabel(annonce.priceType) }}</p>
+            }
+          </div>
+
+          <div class="action-stack">
+            @if (canReserve(annonce)) {
+              <button 
+                type="button" 
+                class="btn-order" 
+                (click)="orderAnnonce()"
+                [disabled]="isReserving || reservationSuccess"
+              >
+                {{ isReserving ? 'Reserving...' : 'Order now' }}
+              </button>
+            } @else {
+              <button 
+                type="button" 
+                class="btn-order disabled" 
+                disabled
+              >
+                Not Available
+              </button>
+            }
+            <button type="button" class="btn-contact" (click)="contactOwner()">Connect with seller</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Seller</h2>
+          <ul>
+            <li><span>Name</span><strong>{{ getOwnerName() }}</strong></li>
+            <li><span>Member ID</span><strong>{{ annonce.ownerId }}</strong></li>
+          </ul>
+
+          <div class="seller-rating-card">
+            <div class="seller-rating-head">
+              <p class="seller-rating-label">Seller rating</p>
+              <strong>{{ getTrustFormattedStars(annonce.owner?.trustScore) }}/5</strong>
+            </div>
+            <div class="seller-stars" aria-label="Seller stars">
+              @for (star of getTrustStarIcons(annonce.owner?.trustScore); track $index) {
+                <span [class.filled]="star !== '☆'">{{ star }}</span>
+              }
+            </div>
+            <p class="seller-rating-meta">Based on trust score (profile)</p>
+          </div>
+
+          <div class="trust-meter">
+            <p class="trust-title">Trust score</p>
+            <div class="meter-track">
+              <div class="meter-fill" [style.width.%]="getFraudPercent(annonce.fraudScore)"></div>
+            </div>
+            <p class="trust-meta">
+              Fraud score: {{ annonce.fraudScore ?? 0 }} · {{ getFraudLevel(annonce.fraudScore) }} risk
+            </p>
+          </div>
+
+          @if (annonce.owner?.badges && annonce.owner?.badges?.length) {
+            <div class="badge-list">
+              @for (badge of annonce.owner?.badges; track badge) {
+                <span class="owner-badge">{{ badge }}</span>
+              }
+            </div>
+          }
+
+          <div class="seller-comments">
+            <p class="seller-comments-title">Seller reviews</p>
+            @if (annonce.ownerReviews && annonce.ownerReviews.length > 0) {
+              <ul class="seller-comments-list">
+                @for (review of annonce.ownerReviews; track review.id) {
+                  <li>
+                    <strong>{{ review.reviewerName }}</strong>
+                    <span>{{ getReviewStars(review.rating) }}</span>
+                    @if (review.comment) {
+                      <p>{{ review.comment }}</p>
+                    }
+                    <small>{{ review.createdAt | date: 'short' }}</small>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="seller-comments-empty">No reviews yet.</p>
+            }
+          </div>
+        </section>
+      </aside>
+    </article>
+  }
+</div>

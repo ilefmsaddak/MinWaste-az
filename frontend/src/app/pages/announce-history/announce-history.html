@@ -1,0 +1,72 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="announce-history-container">
+  <div class="header">
+    <h1>My Announcements</h1>
+    <a routerLink="/create-announce" class="btn-primary">+ New Announcement</a>
+  </div>
+
+  <!-- Filter Section -->
+  <div *ngIf="!isLoading && announces.length > 0" class="filter-section">
+    <div class="filter-group">
+      <label for="category-filter">Category:</label>
+      <select 
+        id="category-filter" 
+        [(ngModel)]="filterCategory" 
+        (change)="onFilterChange()"
+        class="filter-select">
+        <option value="">All Categories</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="status-filter">Status:</label>
+      <select 
+        id="status-filter" 
+        [(ngModel)]="filterStatus" 
+        (change)="onFilterChange()"
+        class="filter-select">
+        <option value="">All</option>
+        <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+      </select>
+    </div>
+
+    <button 
+      *ngIf="filterCategory || filterStatus" 
+      (click)="resetFilters()" 
+      class="btn-reset">
+      Clear Filters
+    </button>
+
+    <div class="filter-results">
+      Showing {{ filteredAnnounces.length }} of {{ announces.length }} announcements
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading">
+    <p>Loading your announcements...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+    <button (click)="loadUserAnnounces()" class="btn-secondary">Try Again</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !errorMessage && emptyMessage" class="empty-state">
+    <p>{{ emptyMessage }}</p>
+    <a routerLink="/create-announce" class="btn-primary">Create Announcement</a>
+  </div>
+
+  <!-- Announcements List -->
+  <div *ngIf="!isLoading && !errorMessage && announces.length > 0" class="announcements-list">
+    <app-announce-list
+      [announces]="filteredAnnounces"
+      (announceDeleted)="onAnnounceDeleted($event)"
+      (announceUpdated)="onAnnounceUpdated($event)"
+    ></app-announce-list>
+  </div>
+</div>

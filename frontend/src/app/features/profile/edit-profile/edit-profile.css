@@ -1,0 +1,7 @@
+/* Styles moved to global `styles.scss` for consistency across pages */
+
+.mw-sync-hint {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 8px;
+}

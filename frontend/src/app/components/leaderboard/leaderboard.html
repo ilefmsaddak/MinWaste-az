@@ -1,0 +1,71 @@
+﻿<div class="leaderboard-container">
+  <div class="leaderboard-header">
+    <h3 class="leaderboard-title">Leaderboard</h3>
+  </div>
+
+  @if (loading()) {
+    <p class="leaderboard-status">Loading leaderboard…</p>
+  }
+
+  @if (error()) {
+    <div class="leaderboard-error" role="alert">
+      {{ error() }}
+      <p class="leaderboard-hint">
+        Start the Nest backend (<code>localhost:4000/graphql</code>) then reload the page.
+      </p>
+    </div>
+  }
+
+  @if (!loading() && !error() && summary(); as s) {
+    <div class="leaderboard-you">
+      <div class="leaderboard-you-row">
+        <span class="you-label">You</span>
+        <span class="you-rank">#{{ s.myRank }}</span>
+      </div>
+      <div class="leaderboard-you-meta">
+        <span>{{ s.myPoints | number }} pts</span>
+        <span>·</span>
+        <span>Level {{ s.level }}</span>
+        @if (s.levelLabel) {
+          <span class="you-badge">{{ s.levelLabel }}</span>
+        }
+      </div>
+      <a routerLink="/dashboard" class="leaderboard-dash-link">
+        View full dashboard (CO₂, points, series…) →
+      </a>
+    </div>
+  }
+
+  <div class="leaderboard-list">
+    @for (user of users(); track user.key) {
+      <div class="leaderboard-item" [class.current-user]="user.isCurrentUser">
+        @if (user.isCurrentUser) {
+          <div class="current-user-highlight">
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring-2"></div>
+            <div class="pulse-ring-3"></div>
+          </div>
+        }
+
+        <div class="rank-badge" [class.rank-current]="user.isCurrentUser">
+          {{ user.rank }}
+        </div>
+
+        <div class="user-avatar" aria-hidden="true">
+          <span class="avatar-initial">{{ initial(user.name) }}</span>
+        </div>
+
+        <div class="user-info">
+          <div class="user-name">{{ user.name }}</div>
+          <div class="user-level">Level {{ user.level }}</div>
+        </div>
+
+        <div class="user-score">{{ user.score | number }}</div>
+      </div>
+    }
+  </div>
+
+  @if (!loading() && !error() && users().length === 0) {
+    <p class="leaderboard-empty">Aucun joueur dans le classement pour l’instant.</p>
+  }
+</div>

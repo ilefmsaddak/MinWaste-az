@@ -1,0 +1,311 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="dash-page">
+  <header class="dash-hero panel">
+    <div class="hero-left">
+      <p class="hero-overline">Impact cockpit</p>
+      <h1>Dashboard</h1>
+      <p class="dash-sub">Votre impact réel, vos performances et votre position dans la communauté.</p>
+
+      @if (!loading && data) {
+        <div class="hero-summary">
+          <div>
+            <span>Niveau</span>
+            <strong>{{ data.level }} · {{ data.levelLabel }}</strong>
+          </div>
+          <div>
+            <span>Points total</span>
+            <strong>{{ data.points | number : '1.0-0' }}</strong>
+          </div>
+          <div>
+            <span>Rang global</span>
+            <strong>#{{ data.leaderboard.myRank || '-' }}</strong>
+          </div>
+          <div class="hero-progress-wrap">
+            <span>Progression niveau</span>
+            <strong>{{ data.pointsToNextLevel }} pts avant niveau suivant</strong>
+            <div class="hero-progress">
+              <div [style.width.%]="data.levelProgressPct"></div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="hero-actions">
+      <button type="button" class="btn-export" (click)="exportCsv()" [disabled]="loading">Export CSV</button>
+      <div class="period-filter" role="group" aria-label="Filtre période">
+        @for (p of periodOptions; track p.value) {
+          <button
+            type="button"
+            class="period-btn"
+            [class.active]="seriesPeriod === p.value"
+            (click)="setSeriesPeriod(p.value)"
+          >
+            {{ p.label }}
+          </button>
+        }
+      </div>
+    </div>
+  </header>
+
+  @if (loading) {
+    <section class="dash-grid">
+      @for (s of skeletonRows; track s) {
+        <div class="dash-card skeleton"></div>
+      }
+    </section>
+    <div class="dash-loading" aria-busy="true" aria-live="polite">
+      <p>Chargement des indicateurs réels…</p>
+    </div>
+  }
+
+  @if (error) {
+    <div class="dash-alert">{{ error }}</div>
+    <button type="button" class="btn-export" (click)="loadDashboard()">Retry</button>
+  }
+
+  @if (!loading && data) {
+    <section class="dash-grid kpi-grid">
+      <div class="dash-card highlight">
+        <span class="dash-label">Total points</span>
+        <strong class="dash-big">{{ data.points | number : '1.0-0' }}</strong>
+        <span class="dash-chip" [ngClass]="deltaClass('points')">{{ formatDelta('points') }}</span>
+      </div>
+      <div class="dash-card">
+        <span class="dash-label">Points gagnés aujourd’hui</span>
+        <strong class="dash-big">{{ data.pointsToday | number : '1.0-0' }}</strong>
+        <span class="dash-muted">depuis minuit ({{ data.timezoneLabel }})</span>
+      </div>
+      <div class="dash-card">
+        <span class="dash-label">Transactions complétées</span>
+        <strong class="dash-big">{{ data.transactionsCompleted }}</strong>
+        <span class="dash-chip" [ngClass]="deltaClass('transactions')">{{ formatDelta('transactions') }}</span>
+      </div>
+      <div class="dash-card">
+        <span class="dash-label">Food rescued</span>
+        <strong class="dash-big">{{ data.foodKgRescued | number : '1.1-2' }} kg</strong>
+        <span class="dash-muted">items exchanged: {{ data.itemsExchanged }}</span>
+      </div>
+      <div class="dash-card">
+        <span class="dash-label">CO₂ avoided</span>
+        <strong class="dash-big">{{ data.totalKgCo2Avoided | number : '1.1-1' }} kg</strong>
+        <span class="dash-chip" [ngClass]="deltaClass('co2')">{{ formatDelta('co2') }}</span>
+      </div>
+      <div class="dash-card">
+        <span class="dash-label">Savings</span>
+        <strong class="dash-big">{{ data.totalMoneySavedTnd | number : '1.2-2' }}</strong>
+        <span class="dash-muted">TND</span>
+        <span class="dash-chip" [ngClass]="deltaClass('savings')">{{ formatDelta('savings') }}</span>
+      </div>
+      <div class="dash-card">
+        <span class="dash-label">Rank global</span>
+        <strong class="dash-big">#{{ data.leaderboard.myRank || '-' }}</strong>
+        <span class="dash-muted">percentile: {{ data.community.percentile | number : '1.0-0' }}%</span>
+      </div>
+      <div class="dash-card">
+        <span class="dash-label">Rank local</span>
+        <strong class="dash-big">
+          @if (data.leaderboardCity.cityLabel) {
+            #{{ data.leaderboardCity.myRank || '-' }}
+          } @else {
+            --
+          }
+        </strong>
+        <span class="dash-muted">
+          @if (data.leaderboardCity.cityLabel) {
+            {{ data.leaderboardCity.cityLabel }}
+          } @else {
+            Ville non définie
+          }
+        </span>
+      </div>
+    </section>
+
+    <section class="dash-section panel">
+      <h2 class="dash-section-title">Impact & progression</h2>
+      <div class="impact-grid">
+        <article class="impact-card">
+          <h3>Progression niveau</h3>
+          <p class="impact-main">{{ data.levelProgressPct | number : '1.0-0' }}%</p>
+          <p class="dash-muted">{{ data.pointsToNextLevel }} points avant le niveau {{ data.level + 1 }}</p>
+          <div class="progress-line"><div [style.width.%]="data.levelProgressPct"></div></div>
+        </article>
+
+        <article class="impact-card">
+          <h3>Répartition des transactions</h3>
+          <div class="impact-list">
+            <span>Dons (donneur) <strong>{{ data.donationsAsDonor }}</strong></span>
+            <span>Dons (receveur) <strong>{{ data.donationsAsReceiver }}</strong></span>
+            <span>Ventes <strong>{{ data.salesAsSeller }}</strong></span>
+            <span>Achats <strong>{{ data.purchasesAsBuyer }}</strong></span>
+          </div>
+        </article>
+
+        <article class="impact-card">
+          <h3>Derniers gains de points</h3>
+          @if (data.recentPointsGains?.length) {
+            <div class="impact-list compact">
+              @for (g of data.recentPointsGains; track g.createdAt) {
+                <span>
+                  +{{ g.delta }} · {{ g.actionCode }}
+                  <small>{{ g.createdAt | date : 'dd/MM HH:mm' }}</small>
+                </span>
+              }
+            </div>
+          } @else {
+            <p class="dash-muted">Aucun gain récent.</p>
+          }
+        </article>
+
+        <article class="impact-card">
+          <h3>Badges récents</h3>
+          @if (data.recentBadges?.length) {
+            <div class="badges-wrap">
+              @for (b of data.recentBadges; track b.code) {
+                <span class="badge-pill" [title]="b.name + ' · ' + (b.earnedAt | date : 'dd/MM/yyyy')">
+                  {{ b.name }}
+                </span>
+              }
+            </div>
+          } @else {
+            <p class="dash-muted">Aucun badge débloqué récemment.</p>
+          }
+        </article>
+      </div>
+    </section>
+
+    <section class="dash-section panel">
+      <h2 class="dash-section-title">Analytics</h2>
+
+      <div class="analytics-grid">
+        <article>
+          <h3>{{ pointsChartTitle() }}</h3>
+          <div class="dash-chart dash-chart--points">
+            @for (m of data.pointsSeries; track m.period) {
+              <div class="dash-bar-wrap">
+                <div
+                  class="dash-bar dash-bar--points"
+                  [style.height.%]="toPercent(m.points, maxPointsSeries())"
+                  [title]="m.period + ': ' + m.points + ' points'"
+                ></div>
+                <span class="dash-bar-label">{{ shortPeriodLabel(m.period) }}</span>
+              </div>
+            }
+          </div>
+        </article>
+
+        <article>
+          <h3>CO₂ évolution mensuelle</h3>
+          <div class="dash-chart">
+            @for (m of data.monthlyCo2Series; track m.period) {
+              <div class="dash-bar-wrap">
+                <div
+                  class="dash-bar"
+                  [style.height.%]="toPercent(m.kgCo2, maxKgSeries())"
+                  [title]="m.period + ': ' + m.kgCo2 + ' kg CO₂'"
+                ></div>
+                <span class="dash-bar-label">{{ shortPeriodLabel(m.period) }}</span>
+              </div>
+            }
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="dash-section panel">
+      <h2 class="dash-section-title">Community comparison</h2>
+      <div class="dash-compare modern">
+        <div class="compare-row">
+          <span>Your impact</span>
+          <strong>{{ data.community.yourKgCo2 | number : '1.1-1' }} kg</strong>
+          <div class="compare-track">
+            <div
+              class="compare-fill you"
+              [style.width.%]="toPercent(data.community.yourKgCo2, (data.community.avgKgCo2PerUser > data.community.yourKgCo2 ? data.community.avgKgCo2PerUser : data.community.yourKgCo2))"
+            ></div>
+          </div>
+        </div>
+
+        <div class="compare-row">
+          <span>Community average</span>
+          <strong>{{ data.community.avgKgCo2PerUser | number : '1.1-1' }} kg</strong>
+          <div class="compare-track">
+            <div
+              class="compare-fill avg"
+              [style.width.%]="toPercent(data.community.avgKgCo2PerUser, (data.community.avgKgCo2PerUser > data.community.yourKgCo2 ? data.community.avgKgCo2PerUser : data.community.yourKgCo2))"
+            ></div>
+          </div>
+        </div>
+
+        <div class="compare-meta">
+          <span>Écart vs moyenne : <strong [class.positive]="data.community.deltaVsAvgPercent >= 0">{{ data.community.deltaVsAvgPercent | number : '1.0-1' }}%</strong></span>
+          <span>Performance du mois : <strong [class.positive]="data.community.monthPointsDeltaPercent >= 0">{{ data.community.monthPointsDeltaPercent | number : '1.0-1' }}%</strong></span>
+          <span>Utilisateurs actifs : <strong>{{ data.community.activeUsersCount }}</strong></span>
+        </div>
+        <p class="dash-muted">{{ data.community.definition }}</p>
+      </div>
+    </section>
+
+    <section class="dash-section panel">
+      <h2 class="dash-section-title">Leaderboard</h2>
+      <p class="dash-rank-you">Votre rang global: <strong>#{{ data.leaderboard.myRank || '-' }}</strong> · {{ data.leaderboard.myPoints }} pts</p>
+
+      <div class="podium">
+        @for (e of top3(); track rowKey(e, $index, 'global-top3')) {
+          <article class="podium-card" [class.podium-1]="e.rank === 1" [class.podium-2]="e.rank === 2" [class.podium-3]="e.rank === 3">
+            <span class="podium-rank">#{{ e.rank }}</span>
+            <strong>{{ e.displayName }}</strong>
+            <span>{{ e.points }} pts · lvl {{ e.level }}</span>
+          </article>
+        }
+      </div>
+
+      <div class="dash-podium">
+        @for (e of next2(); track rowKey(e, $index, 'global-next2')) {
+          <div class="dash-podium-card">
+            <span class="rank">#{{ e.rank }}</span>
+            <span class="name">{{ e.displayName }}</span>
+            <span class="pts">{{ e.points }} pts · lvl {{ e.level }}</span>
+          </div>
+        }
+      </div>
+
+      <article class="your-rank">
+        <h3>Your rank</h3>
+        <p>#{{ data.leaderboard.myRank || '-' }} sur le classement global</p>
+        <p>{{ data.leaderboard.myPoints }} points validés</p>
+      </article>
+
+      <h3 class="sub-title">Leaderboard ville</h3>
+      @if (data.leaderboardCity?.cityLabel) {
+        <p class="dash-rank-you">Ville: <strong>{{ data.leaderboardCity.cityLabel }}</strong> · Rang: <strong>#{{ data.leaderboardCity.myRank || '-' }}</strong></p>
+        <div class="dash-podium">
+          @for (e of data.leaderboardCity.top; track rowKey(e, $index, 'city-top')) {
+            <div class="dash-podium-card">
+              <span class="rank">#{{ e.rank }}</span>
+              <span class="name">{{ e.displayName }}</span>
+              <span class="pts">{{ e.points }} pts · lvl {{ e.level }}</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p>Ajoutez votre ville dans votre profil pour débloquer le leaderboard local.</p>
+          <button type="button" class="ghost-btn" (click)="goToProfile()">Compléter mon profil</button>
+        </div>
+      }
+    </section>
+
+    @if (hasNoTransactions()) {
+      <section class="dash-section panel empty-state">
+        <h2 class="dash-section-title">Aucune transaction complétée</h2>
+        <p>Commencez par réserver ou valider une transaction pour débloquer les métriques d’impact.</p>
+        <div class="empty-actions">
+          <button type="button" class="ghost-btn" (click)="goToBuy()">Explorer les annonces</button>
+          <button type="button" class="ghost-btn" (click)="goToTransactions()">Voir mes transactions</button>
+        </div>
+      </section>
+    }
+  }
+</div>

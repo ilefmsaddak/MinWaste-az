@@ -1,0 +1,85 @@
+<div class="mw-shell">
+  <div class="mw-card">
+    <header class="mw-header">
+      <h1 class="mw-brand">Create account</h1>
+      <p class="mw-tagline">Join MinWaste in seconds</p>
+    </header>
+
+    <div *ngIf="error" class="mw-alert mw-alert--error">{{ error }}</div>
+    <div *ngIf="success" class="mw-alert mw-alert--success">{{ success }}</div>
+
+    <div class="mw-form" style="margin-top: 12px">
+      <div class="mw-field">
+        <label class="mw-label" for="displayName">Display name</label>
+        <input
+          id="displayName"
+          class="mw-input"
+          [(ngModel)]="displayName"
+          type="text"
+          placeholder="Your name"
+          autocomplete="name"
+        />
+      </div>
+
+      <div class="mw-field">
+        <label class="mw-label" for="email">Email</label>
+        <input
+          id="email"
+          class="mw-input"
+          [(ngModel)]="email"
+          type="email"
+          placeholder="you@email.com"
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="mw-field">
+        <label class="mw-label" for="phone">Phone</label>
+        <input
+          id="phone"
+          class="mw-input"
+          [(ngModel)]="phone"
+          type="tel"
+          placeholder="e.g. +213 555 000 000"
+          autocomplete="tel"
+        />
+      </div>
+
+      <div class="mw-field">
+        <label class="mw-label" for="password">Password</label>
+        <input
+          id="password"
+          class="mw-input"
+          [(ngModel)]="password"
+          type="password"
+          placeholder="Create a strong password"
+          autocomplete="new-password"
+        />
+      </div>
+
+      <div class="mw-field">
+        <label class="mw-label" for="confirmPassword">Confirm password</label>
+        <input
+          id="confirmPassword"
+          class="mw-input"
+          [(ngModel)]="confirmPassword"
+          type="password"
+          placeholder="Re-enter your password"
+          autocomplete="new-password"
+        />
+      </div>
+
+      <button
+        class="mw-btn mw-btn--primary"
+        (click)="submit()"
+        [disabled]="loading || !displayName || !email || !password || !confirmPassword"
+      >
+        {{ loading ? 'Creating…' : 'Create account' }}
+      </button>
+
+      <div class="mw-links" style="justify-content: center">
+        <a routerLink="/login">Back to sign in</a>
+      </div>
+    </div>
+  </div>
+</div>

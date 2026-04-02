@@ -1,0 +1,116 @@
+<div class="location-picker">
+  <!-- Collapsed View -->
+  <div class="location-display" *ngIf="!isExpanded" (click)="toggleMap()">
+    <div class="location-info">
+      <svg class="location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+      </svg>
+      <div class="location-details">
+        <span class="location-label">Location *</span>
+        <span class="location-value">
+          {{ selectedLocation || 'Click to select location...' }}
+        </span>
+      </div>
+    </div>
+    <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </div>
+
+  <!-- Expanded Map View -->
+  <div class="location-picker-expanded" *ngIf="isExpanded">
+    <div class="map-header">
+      <h3>Select Location</h3>
+      <button 
+        type="button" 
+        class="close-btn" 
+        (click)="closeMap()"
+        aria-label="Close map"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="map-controls">
+      <button 
+        type="button" 
+        class="btn btn-current-location"
+        (click)="useCurrentLocation()"
+        [disabled]="isLoadingLocation"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="1"></circle>
+          <path d="M12 8v-3M12 19v-3M5 12h3M16 12h3"></path>
+          <circle cx="12" cy="12" r="5"></circle>
+        </svg>
+        {{ isLoadingLocation ? 'Getting Location...' : 'Use My Location' }}
+      </button>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search for a location..."
+            [(ngModel)]="searchQuery"
+            (keyup)="searchLocation()"
+            (focus)="showSearchResults = searchResults.length > 0"
+          />
+          <svg *ngIf="!isSearching" class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <span *ngIf="isSearching" class="search-loading">⟳</span>
+        </div>
+
+        <!-- Search Results -->
+        <div class="search-results" *ngIf="showSearchResults && searchResults.length > 0">
+          <div 
+            class="search-result-item" 
+            *ngFor="let result of searchResults"
+            (click)="selectSearchResult(result)"
+          >
+            <svg class="result-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <div class="result-text">
+              <div class="result-name">{{ result.name || result.display_name.split(',')[0] }}</div>
+              <div class="result-address">{{ result.display_name.split(',')[1] || result.display_name }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="location-display-inline" *ngIf="selectedLocation">
+        <strong>Selected:</strong> {{ selectedLocation }}
+      </div>
+    </div>
+
+    <!-- Map Container -->
+    <div class="map-container">
+      <div #mapContainer class="leaflet-map"></div>
+      <div class="map-hint">Click on the map to select a location</div>
+    </div>
+
+    <div class="map-footer">
+      <button 
+        type="button" 
+        class="btn btn-secondary"
+        (click)="clearLocation()"
+      >
+        Clear Location
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-primary"
+        (click)="closeMap()"
+        [disabled]="!selectedLocation"
+      >
+        Confirm Location
+      </button>
+    </div>
+  </div>
+</div>

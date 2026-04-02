@@ -1,0 +1,135 @@
+<div class="admin-announcements">
+  <div class="page-header">
+    <h1>Announcements Management</h1>
+    <p class="subtitle">Review, approve, or reject user announcements</p>
+  </div>
+
+  <div class="filters-section">
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Search announcements..."
+        [(ngModel)]="searchQuery"
+        class="search-input"
+      >
+      <span class="search-icon">🔍</span>
+    </div>
+
+    <div class="filter-buttons">
+      <button 
+        [class.active]="filterStatus() === 'all'"
+        (click)="filterStatus.set('all')"
+        class="filter-btn"
+      >
+        All
+      </button>
+      <button 
+        [class.active]="filterStatus() === 'ACTIVE'"
+        (click)="filterStatus.set('ACTIVE')"
+        class="filter-btn"
+      >
+        Active
+      </button>
+      <button 
+        [class.active]="filterStatus() === 'HIDDEN'"
+        (click)="filterStatus.set('HIDDEN')"
+        class="filter-btn"
+      >
+        Hidden
+      </button>
+      <button 
+        [class.active]="filterStatus() === 'UNAVAILABLE'"
+        (click)="filterStatus.set('UNAVAILABLE')"
+        class="filter-btn"
+      >
+        Unavailable
+      </button>
+      <button 
+        [class.active]="filterStatus() === 'EXPIRED'"
+        (click)="filterStatus.set('EXPIRED')"
+        class="filter-btn"
+      >
+        Expired
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading">Loading announcements...</div>
+  } @else if (filteredAnnouncements.length === 0) {
+    <div class="empty-state">
+      <p>No announcements found</p>
+    </div>
+  } @else {
+    <div class="announcements-grid">
+      @for (announcement of filteredAnnouncements; track announcement.id) {
+        <div class="announcement-card">
+          <div class="card-header">
+            <h3>{{ announcement.title }}</h3>
+            <span [class]="'badge ' + getStatusBadgeClass(announcement.status)">
+              {{ getStatusLabel(announcement.status) }}
+            </span>
+          </div>
+
+          <p class="description">{{ announcement.description }}</p>
+
+          <div class="card-info">
+            <div class="info-item">
+              <span class="label">Category:</span>
+              <span class="value">{{ announcement.category }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Owner:</span>
+              <span class="value">{{ announcement.ownerName }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Location:</span>
+              <span class="value">{{ announcement.locationAddr }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Quantity:</span>
+              <span class="value">{{ announcement.quantity }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Price:</span>
+              <span class="value">{{ announcement.priceType }} {{ announcement.priceValue ? announcement.priceValue + ' TN' : '' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Created:</span>
+              <span class="value">{{ announcement.createdAt | date: 'short' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Expires:</span>
+              <span class="value">{{ announcement.expiresAt | date: 'short' }}</span>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            @if (announcement.status === 'ACTIVE') {
+              <button
+                (click)="hideAnnouncement(announcement.id)"
+                class="action-btn hide-btn"
+              >
+                👁️ Hide
+              </button>
+            }
+            @if (announcement.status === 'HIDDEN') {
+              <button
+                (click)="showAnnouncement(announcement.id)"
+                class="action-btn show-btn"
+              >
+                👁️ Show
+              </button>
+            }
+            <button
+              (click)="deleteAnnouncement(announcement.id)"
+              class="action-btn delete-btn"
+            >
+              🗑️ Delete
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,20 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="create-announce-page">
+  <div class="alerts-container">
+    <div class="alert alert-success" *ngIf="successMessage">
+      <span class="alert-icon">✓</span>
+      {{ successMessage }}
+    </div>
+    <div class="alert alert-error" *ngIf="errorMessage">
+      <span class="alert-icon">!</span>
+      {{ errorMessage }}
+    </div>
+    <div class="alert alert-info" *ngIf="isLoading">
+      <span class="alert-icon">⏳</span>
+      Creating your announcement...
+    </div>
+  </div>
+
+  <app-announce-form (formSubmit)="onFormSubmit($event)"></app-announce-form>
+</div>

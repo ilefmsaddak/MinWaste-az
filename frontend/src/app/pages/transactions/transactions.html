@@ -1,0 +1,220 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="mw-transactions-page">
+  <!-- LOADING -->
+  @if (isLoading()) {
+    <div class="mw-loading">
+      <div class="mw-spinner"></div>
+      <p>Loading your transactions…</p>
+    </div>
+  }
+
+  <!-- ERROR -->
+  @if (!isLoading() && error()) {
+    <div class="mw-error-panel">
+      <div class="mw-error-icon">⚠️</div>
+      <p>{{ error() }}</p>
+      <button class="mw-btn mw-btn-primary" (click)="loadTransactions()">Try again</button>
+    </div>
+  }
+
+  <!-- CONTENT -->
+  @if (!isLoading() && !error()) {
+    <div class="mw-transactions-container">
+      <!-- HEADER -->
+      <div class="mw-tx-header">
+        <h1>My Transactions</h1>
+        <p>Manage your purchases and incoming reservations</p>
+      </div>
+
+      <!-- TABS -->
+      <div class="mw-tabs">
+        <button
+          class="mw-tab"
+          [class.active]="activeTab() === 'purchases'"
+          (click)="activeTab.set('purchases')"
+        >
+          <span class="mw-tab-icon">🛒</span>
+          My Reservations ({{ getPurchases().length }})
+        </button>
+        <button
+          class="mw-tab"
+          [class.active]="activeTab() === 'received'"
+          (click)="activeTab.set('received')"
+        >
+          <span class="mw-tab-icon">📥</span>
+          Received Reservations ({{ getReceived().length }})
+        </button>
+      </div>
+
+      <!-- PURCHASES TAB -->
+      @if (activeTab() === 'purchases') {
+        <div class="mw-tab-content">
+          @if (getPurchases().length === 0) {
+            <div class="mw-empty-state">
+              <div class="mw-empty-icon">🛒</div>
+              <h3>No reservations yet</h3>
+              <p>When you reserve items, they'll appear here.</p>
+            </div>
+          } @else {
+            <div class="mw-tx-list">
+              @for (tx of getPurchases(); track tx.id) {
+                <div class="mw-tx-card">
+                  <div class="mw-tx-header-card">
+                    <div class="mw-tx-info">
+                      <h3>{{ tx.itemTitle }}</h3>
+                      <p class="mw-tx-seller">From: <strong>{{ tx.ownerName }}</strong></p>
+                    </div>
+                    <div class="mw-tx-status" [style.backgroundColor]="getStatusColor(tx.status)">
+                      {{ getStatusLabel(tx.status) }}
+                    </div>
+                  </div>
+
+                  <div class="mw-tx-body">
+                    <div class="mw-tx-row">
+                      <span class="label">Quantity:</span>
+                      <span class="value">{{ tx.quantity }}</span>
+                    </div>
+                    <div class="mw-tx-row">
+                      <span class="label">Price Type:</span>
+                      <span class="value">{{ tx.itemPriceType }}</span>
+                    </div>
+                    @if (tx.itemPrice > 0) {
+                      <div class="mw-tx-row">
+                        <span class="label">Amount:</span>
+                        <span class="value">{{ tx.itemPrice }} TND</span>
+                      </div>
+                    }
+                    <div class="mw-tx-row">
+                      <span class="label">Reserved:</span>
+                      <span class="value">{{ tx.createdAt | date: 'short' }}</span>
+                    </div>
+                  </div>
+
+                  <div class="mw-tx-actions">
+                    @if (canComplete(tx)) {
+                      <button
+                        class="mw-btn mw-btn-success"
+                        (click)="completeTransaction(tx)"
+                        [disabled]="actionInProgress()[tx.id]"
+                      >
+                        {{ actionInProgress()[tx.id] ? 'Completing...' : '✓ Mark As Received' }}
+                      </button>
+                    }
+
+                    @if (canCancel(tx)) {
+                      <button
+                        class="mw-btn mw-btn-danger"
+                        (click)="cancelTransaction(tx)"
+                        [disabled]="actionInProgress()[tx.id]"
+                      >
+                        {{ actionInProgress()[tx.id] ? 'Canceling...' : '✕ Cancel' }}
+                      </button>
+                      <span class="mw-tx-note">Cancel within {{ getHoursUntilExpiry(tx) }}h</span>
+                    }
+
+                    @if (!canComplete(tx) && !canCancel(tx) && tx.status !== 'COMPLETED') {
+                      <p class="mw-tx-note">Waiting for seller to confirm...</p>
+                    }
+
+                    @if (tx.status === 'COMPLETED') {
+                      <p class="mw-tx-note success">✓ Transaction completed</p>
+                    }
+
+                    @if (tx.status === 'CANCELED') {
+                      <p class="mw-tx-note">✕ Reservation canceled</p>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- RECEIVED TAB -->
+      @if (activeTab() === 'received') {
+        <div class="mw-tab-content">
+          @if (getReceived().length === 0) {
+            <div class="mw-empty-state">
+              <div class="mw-empty-icon">📥</div>
+              <h3>No incoming reservations</h3>
+              <p>When people reserve your items, they'll appear here.</p>
+            </div>
+          } @else {
+            <div class="mw-tx-list">
+              @for (tx of getReceived(); track tx.id) {
+                <div class="mw-tx-card">
+                  <div class="mw-tx-header-card">
+                    <div class="mw-tx-info">
+                      <h3>{{ tx.itemTitle }}</h3>
+                      <p class="mw-tx-buyer">From: <strong>{{ tx.receiverName }}</strong></p>
+                    </div>
+                    <div class="mw-tx-status" [style.backgroundColor]="getStatusColor(tx.status)">
+                      {{ getStatusLabel(tx.status) }}
+                    </div>
+                  </div>
+
+                  <div class="mw-tx-body">
+                    <div class="mw-tx-row">
+                      <span class="label">Quantity:</span>
+                      <span class="value">{{ tx.quantity }}</span>
+                    </div>
+                    <div class="mw-tx-row">
+                      <span class="label">Price Type:</span>
+                      <span class="value">{{ tx.itemPriceType }}</span>
+                    </div>
+                    @if (tx.itemPrice > 0) {
+                      <div class="mw-tx-row">
+                        <span class="label">Amount:</span>
+                        <span class="value">{{ tx.itemPrice }} TND</span>
+                      </div>
+                    }
+                    <div class="mw-tx-row">
+                      <span class="label">Reserved:</span>
+                      <span class="value">{{ tx.createdAt | date: 'short' }}</span>
+                    </div>
+                  </div>
+
+                  <div class="mw-tx-actions">
+                    @if (canConfirm(tx)) {
+                      <button
+                        class="mw-btn mw-btn-primary"
+                        (click)="confirmTransaction(tx)"
+                        [disabled]="actionInProgress()[tx.id]"
+                      >
+                        {{ actionInProgress()[tx.id] ? 'Confirming...' : '✓ Confirm Sale' }}
+                      </button>
+                    }
+
+                    @if (canConfirmDonation(tx)) {
+                      <button
+                        class="mw-btn mw-btn-primary"
+                        (click)="confirmTransaction(tx)"
+                        [disabled]="actionInProgress()[tx.id]"
+                      >
+                        {{ actionInProgress()[tx.id] ? 'Confirming...' : '✓ Confirm Donation' }}
+                      </button>
+                    }
+
+                    @if (!canConfirm(tx) && !canConfirmDonation(tx) && tx.status !== 'COMPLETED' && tx.status !== 'CANCELED') {
+                      <p class="mw-tx-note">Waiting for buyer to complete...</p>
+                    }
+
+                    @if (tx.status === 'COMPLETED') {
+                      <p class="mw-tx-note success">✓ Transaction completed</p>
+                    }
+
+                    @if (tx.status === 'CANCELED') {
+                      <p class="mw-tx-note">✕ Reservation canceled</p>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

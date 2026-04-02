@@ -1,0 +1,30 @@
+<div class="banner-wrapper">
+  <div class="banner">
+    <img src="assets/banner.jpg" alt="MinWaste Banner" class="banner-image">
+    <div class="banner-overlay">
+      <h1 class="banner-title">Let's reduce our waste</h1>
+      <p class="banner-subtitle">Donate, recover or buy products at low prices or for free near you.</p>
+    </div>
+  </div>
+  
+  <div class="filter">
+    <ul class="filter-list">
+      <li class="filter-item" [class.active]="activeFilter() === 'for-you'" (click)="onFilterClick('for-you')">
+        <span class="filter-icon">❤</span>
+        <span class="filter-label">For you</span>
+      </li>
+      <li class="filter-item" [class.active]="activeFilter() === 'near-you'" (click)="onFilterClick('near-you')">
+        <span class="filter-icon">📍</span>
+        <span class="filter-label">Near you</span>
+      </li>
+      <li class="filter-item" [class.active]="activeFilter() === 'popular'" (click)="onFilterClick('popular')">
+        <span class="filter-icon">⭐</span>
+        <span class="filter-label">Popular</span>
+      </li>
+      <li class="filter-item" [class.active]="activeFilter() === 'just-now'" (click)="onFilterClick('just-now')">
+        <span class="filter-icon">⏱</span>
+        <span class="filter-label">Just now</span>
+      </li>
+    </ul>
+  </div>
+</div>

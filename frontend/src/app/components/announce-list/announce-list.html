@@ -1,0 +1,229 @@
+<div class="announce-list">
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Announce Cards -->
+  <div *ngFor="let announce of announces" class="announce-card">
+    <!-- View Mode -->
+    <div *ngIf="editingId !== announce.id && deletingId !== announce.id" class="announce-content">
+      <!-- Header with Title, Status and Actions -->
+      <div class="announce-header">
+        <div class="announce-title-section">
+          <h2>{{ announce.title }}</h2>
+          <span [ngClass]="getStatusBadgeClass(announce.status)" class="badge">
+            {{ announce.status }}
+          </span>
+        </div>
+        <div class="announce-actions">
+          <button
+            (click)="startEdit(announce)"
+            class="btn-edit"
+            title="Edit announcement"
+          >
+            ✏️ Edit
+          </button>
+          <button
+            (click)="confirmDelete(announce.id)"
+            class="btn-delete"
+            title="Delete announcement"
+          >
+            🗑️ Delete
+          </button>
+        </div>
+      </div>
+
+      <!-- Key Information Row -->
+      <div class="key-info-row">
+        <div class="info-item category-highlight">
+          <span class="info-label">Category</span>
+          <span class="info-value">{{ announce.category }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Quantity</span>
+          <span class="info-value">{{ announce.quantity }} units</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Price</span>
+          <span class="info-value">
+            {{ announce.priceType === 'FREE' ? 'Free' : '$' + announce.priceValue }}
+          </span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Location</span>
+          <span class="info-value truncate" [title]="announce.locationAddr">
+            {{ announce.locationAddr }}
+          </span>
+        </div>
+      </div>
+
+     
+
+      <!-- Expand/Collapse Button -->
+      <button
+        (click)="toggleExpand(announce.id)"
+        class="btn-expand"
+        [class.expanded]="expandedId === announce.id"
+      >
+        {{ expandedId === announce.id ? '▼ Show Less' : '▶ Show More' }}
+      </button>
+
+      <!-- Expanded Details Section -->
+      <div *ngIf="expandedId === announce.id" class="expanded-details">
+       
+
+        <div class="detail-group">
+        
+
+           <div class="detail-group">
+          <h3>Full Description</h3>
+          <p>{{ announce.description }}</p>
+        </div>
+          <div class="detail-row">
+            <span class="label">Created:</span>
+            <span class="value">{{ getFormattedDate(announce.createdAt) }}</span>
+          </div>
+          <div *ngIf="announce.expiresAt" class="detail-row">
+            <span class="label">Expires:</span>
+            <span class="value">{{ getFormattedDate(announce.expiresAt) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Price Type:</span>
+            <span class="value">{{ announce.priceType === 'FREE' ? 'Free' : announce.priceType }}</span>
+          </div>
+          
+          
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Mode -->
+    <div *ngIf="editingId === announce.id" class="announce-edit-form">
+      <h3>Edit Announcement</h3>
+
+      <div class="form-group full-width">
+        <label>Title *</label>
+        <input
+          type="text"
+          [(ngModel)]="editFormData['title']"
+          class="form-control"
+          placeholder="Announcement title"
+        />
+      </div>
+
+      <div class="form-group full-width">
+        <label>Description *</label>
+        <textarea
+          [(ngModel)]="editFormData['description']"
+          class="form-control"
+          placeholder="Detailed description"
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category *</label>
+          <select
+            [(ngModel)]="editFormData['category']"
+            class="form-control"
+          >
+            <option value="" disabled>Select category...</option>
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Quantity *</label>
+          <input
+            type="number"
+            [(ngModel)]="editFormData['quantity']"
+            class="form-control"
+            min="1"
+          />
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <app-location-picker 
+          (locationSelected)="onLocationSelectedEdit($event)"
+          [initialLocation]="editFormData['locationAddr']"
+          [initialLatitude]="editFormData['latitude']"
+          [initialLongitude]="editFormData['longitude']"
+        ></app-location-picker>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Expires At</label>
+          <input
+            type="date"
+            [(ngModel)]="editFormData['expiresAt']"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Price Type *</label>
+          <select
+            [(ngModel)]="editFormData['priceType']"
+            class="form-control"
+          >
+            <option value="free">Free</option>
+            <option value="unit">Per Unit</option>
+            <option value="wholesale">Wholesale</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row" *ngIf="editFormData['priceType'] !== 'free'">
+        <div class="form-group full-width">
+          <label>Price (TN) *</label>
+          <input
+            type="number"
+            [(ngModel)]="editFormData['priceValue']"
+            class="form-control"
+            min="0"
+            step="0.01"
+            placeholder="e.g., 50.00"
+          />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button (click)="saveEdit(announce.id)" [disabled]="isSubmitting" class="btn-save">
+          {{ isSubmitting ? 'Saving...' : 'Save Changes' }}
+        </button>
+        <button (click)="cancelEdit()" [disabled]="isSubmitting" class="btn-cancel">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Global Delete Confirmation Modal (Outside Cards) -->
+  <div *ngIf="deletingId" class="delete-confirmation">
+    <div class="confirmation-dialog">
+      <h3>Delete Announcement?</h3>
+      <p *ngIf="getDeletingAnnounce()">Are you sure you want to delete "{{ getDeletingAnnounce()?.title }}"? This action cannot be undone.</p>
+
+      <div class="confirmation-actions">
+        <button
+          (click)="deleteAnnounce(deletingId)"
+          [disabled]="isSubmitting"
+          class="btn-delete-confirm"
+        >
+          {{ isSubmitting ? 'Deleting...' : 'Yes, Delete' }}
+        </button>
+        <button (click)="cancelDelete()" [disabled]="isSubmitting" class="btn-cancel-delete">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

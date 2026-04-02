@@ -1,0 +1,134 @@
+<div class="modal-overlay" *ngIf="isVisible()" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Badge</h2>
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Error Message -->
+      @if (error()) {
+        <div class="alert alert-error">
+          <span class="icon">⚠️</span>
+          <p>{{ error() }}</p>
+        </div>
+      }
+
+      <!-- Success Message -->
+      @if (success()) {
+        <div class="alert alert-success">
+          <span class="icon">✓</span>
+          <p>{{ success() }}</p>
+        </div>
+      }
+
+      <!-- Form -->
+      @if (!success()) {
+        <form (ngSubmit)="submitForm()" class="badge-form">
+          <!-- Badge Name -->
+          <div class="form-group">
+            <label for="name" class="form-label">Badge Name *</label>
+            <input
+              id="name"
+              type="text"
+              class="form-input"
+              placeholder="e.g., Environmental Hero"
+              [value]="formData().name"
+              (input)="onNameInput($event)"
+              [disabled]="isSubmitting()"
+            />
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="description" class="form-label">Description *</label>
+            <textarea
+              id="description"
+              class="form-textarea"
+              placeholder="Describe what users need to do to earn this badge"
+              [value]="formData().description"
+              (input)="onDescriptionInput($event)"
+              [disabled]="isSubmitting()"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <!-- Icon Selector -->
+          <div class="form-group">
+            <label class="form-label">Select Icon *</label>
+            <div class="emoji-picker">
+              @for (emoji of commonEmojis; track emoji) {
+                <button
+                  type="button"
+                  class="emoji-btn"
+                  [class.active]="formData().icon === emoji"
+                  (click)="selectEmoji(emoji)"
+                  [disabled]="isSubmitting()"
+                >
+                  {{ emoji }}
+                </button>
+              }
+            </div>
+            <div class="selected-icon">Selected: {{ formData().icon }}</div>
+          </div>
+
+          <!-- Points Required -->
+          <div class="form-group">
+            <label for="pointsRequired" class="form-label">Points Required *</label>
+            <input
+              id="pointsRequired"
+              type="number"
+              class="form-input"
+              placeholder="e.g., 100"
+              min="1"
+              [value]="formData().pointsRequired"
+              (input)="onPointsInput($event)"
+              [disabled]="isSubmitting()"
+            />
+          </div>
+
+          <!-- Preview -->
+          <div class="badge-preview">
+            <h3>Preview</h3>
+            <div class="preview-card">
+              <div class="preview-icon">{{ formData().icon }}</div>
+              <div class="preview-content">
+                <h4>{{ formData().name || 'Badge Name' }}</h4>
+                <p>{{ formData().description || 'Badge description' }}</p>
+                <div class="preview-info">
+                  <span>{{ formData().pointsRequired }} pts</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Change Indicator -->
+          @if (!isFormChanged() && !error() && !success()) {
+            <div class="info-message">
+              Make changes to update the badge
+            </div>
+          }
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="closeModal()"
+              [disabled]="isSubmitting()"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="!isFormValid() || !isFormChanged() || isSubmitting()"
+            >
+              {{ isSubmitting() ? 'Updating...' : 'Update Badge' }}
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  </div>
+</div>

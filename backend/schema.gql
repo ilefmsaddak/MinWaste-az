@@ -1,0 +1,388 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type UserModel {
+  id: ID!
+  email: String!
+  displayName: String!
+  phone: String
+  city: String
+  role: String!
+  points: Float!
+  trustScore: Float!
+  isSuspended: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type UserProfileModel {
+  bio: String
+  city: String
+  governorate: String
+  avatarUrl: String
+}
+
+type UserWithProfileModel {
+  id: String!
+  email: String!
+  displayName: String!
+  phone: String
+  city: String
+  role: String!
+  points: Float!
+  trustScore: Float!
+  profile: UserProfileModel
+}
+
+type BadgeModel {
+  id: ID!
+  code: String!
+  name: String!
+  description: String
+  earnedAt: DateTime!
+}
+
+type TransactionItemModel {
+  id: ID!
+  title: String!
+  type: String!
+  priceType: String!
+  priceAmount: Float
+  currency: String!
+}
+
+type TransactionModel {
+  id: ID!
+  role: TransactionRole!
+  kind: TransactionKind!
+  status: String!
+  quantity: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  item: TransactionItemModel!
+}
+
+enum TransactionRole {
+  OWNER
+  RECEIVER
+}
+
+enum TransactionKind {
+  DONATION
+  PURCHASE
+}
+
+type NotificationPreferencesModel {
+  reservationCreated: Boolean!
+  reservationCanceled: Boolean!
+  badgeEarned: Boolean!
+}
+
+type PrivacySettingsModel {
+  showEmail: Boolean!
+  showPhone: Boolean!
+  showHistory: Boolean!
+  showBadges: Boolean!
+}
+
+type ProfileModel {
+  user: UserModel!
+  history: [TransactionModel!]!
+  badges: [BadgeModel!]!
+  notificationPreferences: NotificationPreferencesModel!
+  privacySettings: PrivacySettingsModel!
+}
+
+type BadgeProgressEntry {
+  code: String!
+  name: String!
+  description: String
+  progressPercent: Int!
+  unlocked: Boolean!
+  earnedAt: DateTime
+}
+
+type NotificationGql {
+  id: String!
+  type: String!
+  title: String
+  body: String!
+  isRead: Boolean!
+  createdAt: DateTime!
+}
+
+type PointRuleGql {
+  key: String!
+  actionCode: String!
+  points: Int!
+  description: String
+}
+
+type PointsLedgerEntryGql {
+  id: String!
+  delta: Int!
+  balanceAfter: Int!
+  actionCode: String!
+  refType: String
+  refId: String
+  createdAt: DateTime!
+}
+
+type Location {
+  lat: Float!
+  lng: Float!
+  addr: String!
+}
+
+type Owner {
+  id: String!
+  displayName: String!
+  email: String
+  points: Int
+  badges: [String!]
+  trustScore: Int
+}
+
+type Item {
+  id: String!
+  title: String!
+  description: String
+  category: String
+  photos: [String!]!
+  location: Location
+  status: ItemStatus!
+  suggestedCategory: [String!]
+  fraudScore: Float
+  createdAt: DateTime!
+  expiresAt: DateTime
+  quantity: Int
+  priceType: PriceType!
+  priceValue: Float
+  owner: Owner
+}
+
+enum ItemStatus {
+  DRAFT
+  PUBLISHED
+  RESERVED
+  UNAVAILABLE
+  EXPIRED
+  BLOCKED
+}
+
+enum PriceType {
+  FREE
+  UNIT
+  BULK
+}
+
+type MonthlySeriesPointGql {
+  period: String!
+  kgCo2: Float!
+  moneySavedTnd: Float!
+}
+
+type KpiDeltaGql {
+  metric: String!
+  currentValue: Float!
+  previousValue: Float
+  deltaPercent: Float
+}
+
+type RecentBadgeGql {
+  code: String!
+  name: String!
+  earnedAt: String!
+}
+
+type RecentPointsGainGql {
+  delta: Int!
+  actionCode: String!
+  createdAt: String!
+}
+
+type LeaderboardEntryGql {
+  rank: Int!
+  displayName: String!
+  points: Int!
+  level: Int!
+}
+
+type LeaderboardGql {
+  top: [LeaderboardEntryGql!]!
+  myRank: Int!
+  myPoints: Int!
+}
+
+type LeaderboardCityGql {
+  top: [LeaderboardEntryGql!]!
+  myRank: Int!
+  myPoints: Int!
+  cityLabel: String
+}
+
+type PointsSeriesPointGql {
+  period: String!
+  points: Int!
+}
+
+type CommunityBenchmarkGql {
+  avgKgCo2PerUser: Float!
+  yourKgCo2: Float!
+  deltaVsAvgPercent: Float!
+  percentile: Float!
+  activeUsersCount: Int!
+  monthPoints: Int!
+  avgMonthPointsPerActiveUser: Float!
+  monthPointsDeltaPercent: Float!
+  definition: String!
+}
+
+type DashboardGql {
+  timezoneLabel: String!
+  points: Int!
+  level: Int!
+  levelLabel: String!
+  pointsToday: Int!
+  pointsToNextLevel: Int!
+  nextLevelPoints: Int!
+  levelProgressPct: Float!
+  foodKgRescued: Float!
+  itemsExchanged: Int!
+  totalKgCo2Avoided: Float!
+  totalMoneySavedTnd: Float!
+  transactionsCompleted: Int!
+  donationsAsDonor: Int!
+  donationsAsReceiver: Int!
+  salesAsSeller: Int!
+  purchasesAsBuyer: Int!
+  kpiDeltas: [KpiDeltaGql!]!
+  pointsSeries: [PointsSeriesPointGql!]!
+  monthlyCo2Series: [MonthlySeriesPointGql!]!
+  community: CommunityBenchmarkGql!
+  leaderboard: LeaderboardGql!
+  leaderboardCity: LeaderboardCityGql!
+  recentBadges: [RecentBadgeGql!]!
+  recentPointsGains: [RecentPointsGainGql!]!
+}
+
+type UserResponse {
+  id: String!
+  display_name: String!
+}
+
+type ItemResponse {
+  id: String!
+  title: String!
+  price_amount: Float
+  price_type: String
+  users: UserResponse
+}
+
+type TransactionResponse {
+  id: String!
+  status: String!
+  quantity: Int!
+  item: ItemResponse
+  owner: UserResponse
+  receiver: UserResponse
+  created_at: String!
+  updated_at: String!
+}
+
+type RecommendationItem {
+  id: String!
+  title: String!
+  description: String
+  category: String
+  photos: [String!]!
+  address: String
+  priceType: String!
+  priceAmount: Float
+  currency: String
+  score: Float!
+  reason: String!
+  reasonCode: String!
+}
+
+type RecommendationsResponse {
+  items: [RecommendationItem!]!
+  hasMore: Boolean!
+  generatedAt: DateTime!
+  message: String
+}
+
+type Query {
+  me: UserModel!
+  meWithProfile: UserWithProfileModel!
+  myProfile: ProfileModel!
+  badgeProgress: [BadgeProgressEntry!]!
+  myNotifications: [NotificationGql!]!
+  unreadNotificationsCount: Int!
+  pointRules: [PointRuleGql!]!
+  myPointsToday: Int!
+  myPointsLedger(take: Int = 50): [PointsLedgerEntryGql!]!
+  myDashboard(pointsSeriesPeriod: DashboardSeriesPeriod = MONTH): DashboardGql!
+  myTransactions: [TransactionResponse!]!
+  userEcologyDashboard: String!
+  communityEcologyDashboard: String!
+  recommendedItems(limit: Int! = 10): RecommendationsResponse!
+  browsingHistory(limit: Int! = 20): [String!]!
+  items: [Item!]!
+  item(id: String!): Item
+  itemsByCategory(category: String!): [Item!]!
+  itemsByStatus(status: String!): [Item!]!
+  itemsByOwnerId(ownerId: String!): [Item!]!
+}
+
+"""Période du dashboard (7j, 30j, 12 mois, tout)"""
+enum DashboardSeriesPeriod {
+  WEEK
+  MONTH
+  YEAR
+  ALL
+}
+
+type Mutation {
+  updateProfile(input: UpdateProfileInput!): UserModel!
+  updateNotificationPreferences(input: UpdateNotificationPreferencesInput!): NotificationPreferencesModel!
+  updatePrivacySettings(input: UpdatePrivacySettingsInput!): PrivacySettingsModel!
+  markNotificationRead(id: String!): Boolean!
+  markAllNotificationsRead: Boolean!
+  completeTransaction(transactionId: String!): Boolean!
+  createReservation(itemId: String!, quantity: Int! = 1): String!
+  cancelReservation(transactionId: String!, reason: String): Boolean!
+  confirmDonationTransaction(transactionId: String!): Boolean!
+  confirmSaleTransaction(transactionId: String!): Boolean!
+  generateMonthlyReport(month: Int!, year: Int!): String!
+  initializeEcologyFactors: Boolean!
+  trackItemView(itemId: String!): Boolean!
+}
+
+input UpdateProfileInput {
+  displayName: String
+  phone: String
+  bio: String
+  city: String
+  governorate: String
+  avatarUrl: String
+}
+
+input UpdateNotificationPreferencesInput {
+  reservationCreated: Boolean
+  reservationCanceled: Boolean
+  badgeEarned: Boolean
+}
+
+input UpdatePrivacySettingsInput {
+  showEmail: Boolean
+  showPhone: Boolean
+  showHistory: Boolean
+  showBadges: Boolean
+}

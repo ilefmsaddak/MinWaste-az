@@ -1,0 +1,25 @@
+<div class="dialog-overlay" *ngIf="isVisible()" (click)="onCancel()">
+  <div class="dialog-container" (click)="$event.stopPropagation()">
+    <div class="dialog-header">
+      <h2>Delete Badge</h2>
+      <button class="close-btn" (click)="onCancel()" aria-label="Close dialog">✕</button>
+    </div>
+
+    <div class="dialog-content">
+      <p class="warning-icon">⚠️</p>
+      <p class="warning-text">
+        Are you sure you want to delete the badge <strong>"{{ itemName() }}"</strong>?
+      </p>
+      <p class="warning-subtext">This action cannot be undone.</p>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" (click)="onCancel()">
+        Cancel
+      </button>
+      <button class="btn btn-danger" (click)="onConfirm()">
+        Delete Badge
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,435 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model badges {
+  id          String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  code        String        @unique
+  name        String
+  description String?
+  criteria    Json
+  created_at  DateTime      @default(now()) @db.Timestamptz(6)
+  user_badges user_badges[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model conversations {
+  id                                  String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  /// Optional: null = direct message thread (no listing), per Tessnime-style chat
+  item_id                             String?    @db.Uuid
+  user1_id                            String     @db.Uuid
+  user2_id                            String     @db.Uuid
+  last_message_at                     DateTime?  @db.Timestamptz(6)
+  created_at                          DateTime   @default(now()) @db.Timestamptz(6)
+  items                               items?     @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_conversations_user1_idTousers users      @relation("conversations_user1_idTousers", fields: [user1_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_conversations_user2_idTousers users      @relation("conversations_user2_idTousers", fields: [user2_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  messages                            messages[]
+
+  @@index([item_id], map: "idx_conversations_item")
+  @@index([user1_id, user2_id], map: "idx_conversations_users")
+}
+
+model ecology_factors {
+  id                       String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  category                 String   @unique
+  default_weight_kg        Decimal  @db.Decimal(8, 3)
+  co2_factor_kg_per_kg     Decimal  @db.Decimal(8, 3)
+  water_factor_l_per_kg    Decimal  @db.Decimal(8, 3)
+  energy_factor_kwh_per_kg Decimal  @db.Decimal(8, 3)
+  created_at               DateTime @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model events {
+  id         String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String     @db.Uuid
+  type       event_type
+  meta       Json?
+  created_at DateTime   @default(now()) @db.Timestamptz(6)
+  users      users      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([type], map: "idx_events_type")
+  @@index([user_id], map: "idx_events_user")
+}
+
+model favorites {
+  user_id    String   @db.Uuid
+  item_id    String   @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  items      items    @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, item_id])
+}
+
+model item_photos {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  item_id    String   @db.Uuid
+  url        String
+  position   Int      @default(0) @db.SmallInt
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  items      items    @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([item_id], map: "idx_item_photos_item")
+}
+
+model item_views {
+  user_id        String   @db.Uuid
+  item_id        String   @db.Uuid
+  view_count     Int      @default(1)
+  last_viewed_at DateTime @default(now()) @db.Timestamptz(6)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  items          items    @relation(fields: [item_id], references: [id], onDelete: Cascade)
+  users          users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, item_id])
+  @@index([user_id, last_viewed_at(sort: Desc)])
+  @@index([item_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model items {
+  id                  String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  owner_id            String                @db.Uuid
+  type                item_type
+  title               String
+  description         String?
+  category            String?
+  suggested_category  Json?
+  condition           item_condition?
+  status              item_status           @default(DRAFT)
+  price_type          price_type            @default(FREE)
+  price_amount        Decimal?              @db.Decimal(10, 2)
+  currency            String                @default("TND") @db.Char(3)
+  quantity_total      Int                   @default(1)
+  quantity_available  Int                   @default(1)
+  expires_at          DateTime?             @db.Timestamptz(6)
+  lat                 Decimal               @db.Decimal(9, 6)
+  lng                 Decimal               @db.Decimal(9, 6)
+  address             String?
+  fraud_score         Int                   @default(0) @db.SmallInt
+  created_at          DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime              @default(now()) @db.Timestamptz(6)
+  conversations       conversations[]
+  favorites           favorites[]
+  item_photos         item_photos[]
+  item_views          item_views[]
+  users               users                 @relation(fields: [owner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  reports             reports[]
+  transaction_impacts transaction_impacts[]
+  transactions        transactions[]
+
+  @@index([lat, lng], map: "idx_items_location")
+  @@index([owner_id], map: "idx_items_owner")
+  @@index([status], map: "idx_items_status")
+  @@index([suggested_category], map: "idx_items_suggested_gin", type: Gin)
+}
+
+model messages {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  conversation_id String        @db.Uuid
+  sender_id       String        @db.Uuid
+  content         String
+  created_at      DateTime      @default(now()) @db.Timestamptz(6)
+  read_at         DateTime?     @db.Timestamptz(6)
+  conversations   conversations @relation(fields: [conversation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users           users         @relation(fields: [sender_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([conversation_id], map: "idx_messages_convo")
+  @@index([sender_id], map: "idx_messages_sender")
+}
+
+model monthly_reports {
+  id                     String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  month                  Int      @db.SmallInt
+  year                   Int      @db.SmallInt
+  total_co2_saved_kg     Decimal  @db.Decimal(12, 3)
+  total_food_saved_kg    Decimal  @db.Decimal(12, 3)
+  total_water_saved_l    Decimal  @db.Decimal(15, 3)
+  total_energy_saved_kwh Decimal  @db.Decimal(12, 3)
+  total_waste_reduced_kg Decimal  @db.Decimal(12, 3)
+  tree_equivalent        Decimal  @db.Decimal(10, 2)
+  top_category           String?
+  top_neighborhood       String?
+  recommendations        Json?
+  generated_at           DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([month, year])
+  @@index([year, month])
+}
+
+model notifications {
+  id          String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  receiver_id String     @db.Uuid
+  type        notif_type
+  title       String?
+  body        String
+  payload     Json?
+  is_read     Boolean    @default(false)
+  created_at  DateTime   @default(now()) @db.Timestamptz(6)
+  users       users      @relation(fields: [receiver_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([receiver_id], map: "idx_notifications_receiver")
+  @@index([receiver_id, is_read, created_at(sort: Desc)], map: "idx_notifications_unread")
+}
+
+model points_ledger {
+  id              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id         String   @db.Uuid
+  delta           Int
+  balance_after   Int
+  action_code     String   @db.VarChar(64)
+  ref_type        String?  @db.VarChar(32)
+  ref_id          String?  @db.Uuid
+  idempotency_key String   @unique @db.VarChar(200)
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+  users           users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([action_code], map: "idx_points_ledger_action")
+  @@index([user_id, created_at(sort: Desc)], map: "idx_points_ledger_user_date")
+}
+
+model reports {
+  id          String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  item_id     String        @db.Uuid
+  reporter_id String        @db.Uuid
+  reason      String
+  status      report_status @default(OPEN)
+  created_at  DateTime      @default(now()) @db.Timestamptz(6)
+  items       items         @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users       users         @relation(fields: [reporter_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([item_id], map: "idx_reports_item")
+  @@index([status], map: "idx_reports_status")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model reviews {
+  id                               String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  transaction_id                   String       @unique @db.Uuid
+  reviewed_id                      String       @db.Uuid
+  reviewer_id                      String       @db.Uuid
+  rating                           Int          @db.SmallInt
+  comment                          String?
+  created_at                       DateTime     @default(now()) @db.Timestamptz(6)
+  users_reviews_reviewed_idTousers users        @relation("reviews_reviewed_idTousers", fields: [reviewed_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_reviews_reviewer_idTousers users        @relation("reviews_reviewer_idTousers", fields: [reviewer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  transactions                     transactions @relation(fields: [transaction_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([reviewed_id], map: "idx_reviews_reviewed")
+}
+
+model transaction_impacts {
+  id                                           String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  transaction_id                               String       @unique @db.Uuid
+  item_id                                      String       @db.Uuid
+  owner_id                                     String       @db.Uuid
+  receiver_id                                  String       @db.Uuid
+  category                                     String
+  quantity                                     Int
+  effective_weight_kg                          Decimal      @db.Decimal(10, 3)
+  food_saved_kg                                Decimal      @db.Decimal(10, 3)
+  co2_saved_kg                                 Decimal      @db.Decimal(10, 3)
+  water_saved_liters                           Decimal      @db.Decimal(12, 3)
+  energy_saved_kwh                             Decimal      @db.Decimal(10, 3)
+  landfill_diversion_kg                        Decimal      @db.Decimal(10, 3)
+  tree_equivalent                              Decimal      @db.Decimal(8, 2)
+  neighborhood                                 String?
+  completed_at                                 DateTime     @db.Timestamptz(6)
+  created_at                                   DateTime     @default(now()) @db.Timestamptz(6)
+  items                                        items        @relation(fields: [item_id], references: [id], onDelete: Cascade)
+  users_transaction_impacts_owner_idTousers    users        @relation("transaction_impacts_owner_idTousers", fields: [owner_id], references: [id], onDelete: Cascade)
+  users_transaction_impacts_receiver_idTousers users        @relation("transaction_impacts_receiver_idTousers", fields: [receiver_id], references: [id], onDelete: Cascade)
+  transactions                                 transactions @relation(fields: [transaction_id], references: [id], onDelete: Cascade)
+
+  @@index([category])
+  @@index([completed_at])
+  @@index([owner_id, completed_at])
+  @@index([receiver_id, completed_at])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model transactions {
+  id                                    String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  item_id                               String               @db.Uuid
+  owner_id                              String               @db.Uuid
+  receiver_id                           String               @db.Uuid
+  quantity                              Int
+  status                                transaction_status   @default(PENDING)
+  reserved_until                        DateTime             @db.Timestamptz(6)
+  canceled_reason                       String?
+  created_at                            DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at                            DateTime             @default(now()) @db.Timestamptz(6)
+  reviews                               reviews?
+  transaction_impacts                   transaction_impacts?
+  items                                 items                @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_transactions_owner_idTousers    users                @relation("transactions_owner_idTousers", fields: [owner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_transactions_receiver_idTousers users                @relation("transactions_receiver_idTousers", fields: [receiver_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([item_id], map: "idx_transactions_item")
+  @@index([owner_id], map: "idx_transactions_owner")
+  @@index([receiver_id], map: "idx_transactions_receiver")
+  @@index([status], map: "idx_transactions_status")
+}
+
+model user_badges {
+  user_id   String   @db.Uuid
+  badge_id  String   @db.Uuid
+  earned_at DateTime @default(now()) @db.Timestamptz(6)
+  badges    badges   @relation(fields: [badge_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users     users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, badge_id])
+}
+
+model user_preferences {
+  user_id                   String             @id @db.Uuid
+  notif_push_enabled        Boolean            @default(true)
+  notif_email_enabled       Boolean            @default(true)
+  notif_inapp_enabled       Boolean            @default(true)
+  notif_messages            Boolean            @default(true)
+  notif_badges              Boolean            @default(true)
+  notif_reservation_updates Boolean            @default(true)
+  profile_visibility        profile_visibility @default(PUBLIC)
+  show_phone                Boolean            @default(false)
+  show_history              Boolean            @default(true)
+  show_badges               Boolean            @default(true)
+  show_exact_location       Boolean            @default(false)
+  created_at                DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime           @default(now()) @db.Timestamptz(6)
+  users                     users              @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([profile_visibility], map: "idx_user_preferences_visibility")
+}
+
+model user_profiles {
+  user_id             String   @id @db.Uuid
+  avatar_url          String?
+  bio                 String?
+  city                String?
+  governorate         String?
+  public_display_name String?
+  created_at          DateTime @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime @default(now()) @db.Timestamptz(6)
+  users               users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([city], map: "idx_user_profiles_city")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model users {
+  id                                                         String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email                                                      String                @unique
+  display_name                                               String
+  phone                                                      String?
+  role                                                       user_role             @default(USER)
+  points                                                     Int                   @default(0)
+  trust_score                                                Int                   @default(50) @db.SmallInt
+  is_suspended                                               Boolean               @default(false)
+  created_at                                                 DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at                                                 DateTime              @default(now()) @db.Timestamptz(6)
+  firebase_uid                                               String?               @unique
+  password_hash                                              String?
+  city                                                       String?
+  conversations_conversations_user1_idTousers                conversations[]       @relation("conversations_user1_idTousers")
+  conversations_conversations_user2_idTousers                conversations[]       @relation("conversations_user2_idTousers")
+  events                                                     events[]
+  favorites                                                  favorites[]
+  item_views                                                 item_views[]
+  items                                                      items[]
+  messages                                                   messages[]
+  notifications                                              notifications[]
+  points_ledger                                              points_ledger[]
+  reports                                                    reports[]
+  reviews_reviews_reviewed_idTousers                         reviews[]             @relation("reviews_reviewed_idTousers")
+  reviews_reviews_reviewer_idTousers                         reviews[]             @relation("reviews_reviewer_idTousers")
+  transaction_impacts_transaction_impacts_owner_idTousers    transaction_impacts[] @relation("transaction_impacts_owner_idTousers")
+  transaction_impacts_transaction_impacts_receiver_idTousers transaction_impacts[] @relation("transaction_impacts_receiver_idTousers")
+  transactions_transactions_owner_idTousers                  transactions[]        @relation("transactions_owner_idTousers")
+  transactions_transactions_receiver_idTousers               transactions[]        @relation("transactions_receiver_idTousers")
+  user_badges                                                user_badges[]
+  user_preferences                                           user_preferences?
+  user_profiles                                              user_profiles?
+
+  @@index([role], map: "idx_users_role")
+  @@index([is_suspended], map: "idx_users_suspended")
+}
+
+enum event_type {
+  ITEM_CREATED
+  RESERVED
+  CANCELED
+  COMPLETED
+  REVIEW_LEFT
+  BADGE_EARNED
+}
+
+enum item_condition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+}
+
+enum item_status {
+  DRAFT
+  PUBLISHED
+  RESERVED
+  UNAVAILABLE
+  EXPIRED
+  BLOCKED
+}
+
+enum item_type {
+  FOOD
+  CLOTHES
+}
+
+enum notif_type {
+  RESERVATION_CREATED
+  RESERVATION_CANCELED
+  PICKUP_CONFIRMED
+  MESSAGE_RECEIVED
+  ITEM_EXPIRED
+  ADMIN_ACTION
+  BADGE_EARNED
+  RESERVATION_CONFIRMED
+}
+
+enum price_type {
+  FREE
+  UNIT
+  BULK
+}
+
+enum profile_visibility {
+  PUBLIC
+  PRIVATE
+  CONTACTS_ONLY
+}
+
+enum report_status {
+  OPEN
+  REVIEWED
+  REJECTED
+  ACTION_TAKEN
+}
+
+enum transaction_status {
+  PENDING
+  CONFIRMED_BY_SENDER
+  COMPLETED
+  CANCELED
+  EXPIRED
+}
+
+enum user_role {
+  USER
+  ADMIN
+}

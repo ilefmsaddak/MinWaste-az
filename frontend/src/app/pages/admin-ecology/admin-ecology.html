@@ -1,0 +1,196 @@
+<div class="admin-ecology">
+  <div class="page-header">
+    <h1>🌍 Ecology Impact Dashboard</h1>
+    <p class="subtitle">Monitor environmental impact and sustainability metrics</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading">Loading ecology data...</div>
+  } @else {
+    <!-- Metrics Section -->
+    <div class="metrics-section">
+      <h2>Key Environmental Metrics</h2>
+      <div class="metrics-grid">
+        @for (metric of metrics(); track metric.id) {
+          <div 
+            class="metric-card"
+            (click)="viewMetricDetails(metric)"
+            [style.border-left]="'4px solid ' + metric.color"
+          >
+            <div class="metric-header">
+              <span class="metric-icon">{{ metric.icon }}</span>
+              <div class="metric-title">
+                <h3>{{ metric.name }}</h3>
+                <p class="metric-desc">{{ metric.description }}</p>
+              </div>
+            </div>
+            
+            <div class="metric-value">
+              <p class="value">{{ metric.value }}</p>
+              <p class="unit">{{ metric.unit }}</p>
+            </div>
+
+            <div class="trend" [class]="getTrendClass(metric.trend)">
+              <span class="trend-icon">{{ getTrendIcon(metric.trend) }}</span>
+              <span class="trend-text">{{ metric.trend > 0 ? '+' : '' }}{{ metric.trend }}%</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Monthly Progress Section -->
+    <div class="monthly-section">
+      <h2>Monthly Progress</h2>
+      <div class="monthly-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Period</th>
+              <th>CO2 Saved (kg)</th>
+              <th>Food Saved (kg)</th>
+              <th>Water Saved (L)</th>
+              <th>Waste Reduced (kg)</th>
+              <th>Energy Saved (kWh)</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of monthlyData(); track data.period) {
+              <tr>
+                <td><strong>{{ data.period }}</strong></td>
+                <td>{{ data.co2Saved }}</td>
+                <td>{{ data.foodSaved }}</td>
+                <td>{{ data.waterSaved }}</td>
+                <td>{{ data.wasteReduced }}</td>
+                <td>{{ data.energySaved }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Reports Section -->
+    <div class="reports-section">
+      <div class="reports-header">
+        <h2>Generated Reports</h2>
+        <button 
+          class="btn-generate"
+          (click)="showReportForm.set(!showReportForm())"
+        >
+          📄 Generate New Report
+        </button>
+      </div>
+
+      @if (showReportForm()) {
+        <div class="report-form">
+          <div class="form-group">
+            <label for="period">Select Period:</label>
+            <select 
+              id="period"
+              [(ngModel)]="reportPeriod"
+              class="form-input"
+            >
+              <option value="January 2026">January 2026</option>
+              <option value="February 2026">February 2026</option>
+              <option value="March 2026">March 2026</option>
+              <option value="Q1 2026">Q1 2026</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button 
+              class="btn-primary"
+              (click)="generateReport()"
+            >
+              ✅ Generate Report
+            </button>
+            <button 
+              class="btn-secondary"
+              (click)="showReportForm.set(false)"
+            >
+              ✖️ Cancel
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (reports().length > 0) {
+        <div class="reports-list">
+          @for (report of reports(); track report.id) {
+            <div class="report-card">
+              <div class="report-header">
+                <h3>{{ report.title }}</h3>
+                <span class="report-date">{{ report.generatedDate | date: 'medium' }}</span>
+              </div>
+              
+              <p class="report-summary">{{ report.summary }}</p>
+
+              <div class="report-recommendations">
+                <h4>Recommendations:</h4>
+                <ul>
+                  @for (rec of report.recommendations.slice(0, 3); track $index) {
+                    <li>{{ rec }}</li>
+                  }
+                </ul>
+              </div>
+
+              <div class="report-actions">
+                <button 
+                  class="btn-download"
+                  (click)="downloadReport(report.id)"
+                >
+                  ⬇️ Download
+                </button>
+                <button 
+                  class="btn-delete"
+                  (click)="deleteReport(report.id)"
+                >
+                  🗑️ Delete
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p>No reports generated yet. Create your first ecology impact report!</p>
+        </div>
+      }
+    </div>
+
+    <!-- Metric Details Modal -->
+    @if (selectedMetricForDetails()) {
+      <div class="modal-overlay" (click)="closeMetricDetails()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>{{ selectedMetricForDetails()!.icon }} {{ selectedMetricForDetails()!.name }}</h2>
+            <button class="close-btn" (click)="closeMetricDetails()">✕</button>
+          </div>
+          
+          <div class="modal-body">
+            <p class="description">{{ selectedMetricForDetails()!.description }}</p>
+            
+            <div class="metric-stats">
+              <div class="stat">
+                <span class="label">Current Value:</span>
+                <span class="value">{{ selectedMetricForDetails()!.value }} {{ selectedMetricForDetails()!.unit }}</span>
+              </div>
+              <div class="stat">
+                <span class="label">Trend:</span>
+                <span class="value" [class]="getTrendClass(selectedMetricForDetails()!.trend)">
+                  {{ getTrendIcon(selectedMetricForDetails()!.trend) }} 
+                  {{ selectedMetricForDetails()!.trend > 0 ? '+' : '' }}{{ selectedMetricForDetails()!.trend }}%
+                </span>
+              </div>
+            </div>
+
+            <div class="impact-analysis">
+              <h3>Impact Analysis</h3>
+              <p>This metric represents significant environmental value. The {{ selectedMetricForDetails()!.value | number }} {{ selectedMetricForDetails()!.unit }} saved demonstrate the positive impact our community is making on sustainability.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

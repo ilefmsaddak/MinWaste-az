@@ -1,0 +1,420 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="mw-page">
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="mw-loading">
+    <div class="mw-spinner"></div>
+    <p>Loading your profile…</p>
+  </div>
+
+  <!-- ERROR -->
+  <div *ngIf="!loading && error" class="mw-error">
+    <div class="mw-error-icon">⚠️</div>
+    <p>{{ error }}</p>
+    <button class="mw-btn mw-btn-primary" (click)="ngOnInit()">Try again</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div *ngIf="!loading && !error && profile" class="mw-profile">
+
+    <!-- HERO -->
+    <div class="mw-hero">
+      <div class="mw-hero-bg"></div>
+
+      <div class="mw-hero-body">
+        <div class="mw-hero-identity">
+          <div class="mw-avatar">
+            {{ (profile?.user?.displayName || profile?.user?.email || '?').charAt(0).toUpperCase() }}
+          </div>
+
+          <div class="mw-hero-info">
+            <h1 class="mw-hero-name">{{ profile?.user?.displayName ?? '—' }}</h1>
+
+            <span class="mw-hero-email">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              {{ profile?.user?.email ?? '—' }}
+            </span>
+
+            <span class="mw-role-badge">{{ profile?.user?.role ?? 'USER' }}</span>
+          </div>
+        </div>
+
+        <div class="mw-hero-actions">
+          <button type="button" class="mw-btn mw-btn-primary" (click)="goToEditProfile()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            Edit Profile
+          </button>
+
+          <button type="button" class="mw-btn mw-btn-ghost" (click)="goToDashboard()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm10 8h8V11h-8v10zM3 21h8v-6H3v6zm10-10h8V3h-8v8z"/>
+            </svg>
+            Dashboard
+          </button>
+
+          <button class="mw-btn mw-btn-ghost" (click)="logout()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            Sign out
+          </button>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="mw-stats">
+        <div class="mw-stat">
+          <div class="mw-stat-icon mw-stat-icon--amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+            </svg>
+          </div>
+          <div class="mw-stat-text">
+            <div class="mw-stat-value">{{ profile?.user?.points ?? 0 }}</div>
+            <div class="mw-stat-label">Points</div>
+          </div>
+        </div>
+
+        <div class="mw-stat">
+          <div class="mw-stat-icon mw-stat-icon--blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+          <div class="mw-stat-text">
+            <div class="mw-stat-value">{{ profile?.user?.trustScore ?? 0 }}</div>
+            <div class="mw-stat-label">Trust Score</div>
+          </div>
+        </div>
+
+        <div class="mw-stat">
+          <div class="mw-stat-icon mw-stat-icon--purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+            </svg>
+          </div>
+          <div class="mw-stat-text">
+            <div class="mw-stat-value">{{ profile?.badges?.length ?? 0 }}</div>
+            <div class="mw-stat-label">Badges</div>
+          </div>
+        </div>
+
+        <div class="mw-stat">
+          <div class="mw-stat-icon mw-stat-icon--green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+          </div>
+          <div class="mw-stat-text">
+            <div class="mw-stat-value">{{ profile?.history?.length ?? 0 }}</div>
+            <div class="mw-stat-label">Transactions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIDDLE CARDS -->
+    <div class="mw-grid-2">
+
+      <!-- BADGES -->
+      <div class="mw-card mw-card--badges">
+        <div class="mw-card-header">
+          <div class="mw-card-title">
+            <span class="mw-card-title-icon">🏅</span>
+            <span>Badges & Achievements</span>
+          </div>
+          <span class="mw-pill">{{ profile?.badges?.length || 0 }} earned</span>
+        </div>
+
+        <div class="mw-card-body mw-card-body--center">
+          <div *ngIf="!profile.badges?.length" class="mw-empty mw-empty--compact">
+            <div class="mw-empty-emoji">🌱</div>
+            <h4>Start your eco journey!</h4>
+            <p>Make your first donation or purchase to unlock your first badge.</p>
+          </div>
+
+          <div *ngIf="profile.badges?.length" class="mw-badges-grid">
+            <div *ngFor="let b of profile.badges" class="mw-badge-chip" [title]="b.description || ''">
+              <div class="mw-badge-chip-icon">🏆</div>
+              <div class="mw-badge-chip-name">{{ b.name }}</div>
+              <div class="mw-badge-chip-date" *ngIf="b.earnedAt">{{ b.earnedAt | date:'mediumDate' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="mw-card mw-card--settings">
+        <div class="mw-card-header">
+          <div class="mw-card-title">
+            <span class="mw-card-title-icon">⚙️</span>
+            <span>Quick Settings</span>
+          </div>
+        </div>
+
+        <div class="mw-card-body">
+          <div class="mw-settings-list">
+            <button type="button" class="mw-setting-row" (click)="openNotifModal()">
+              <div class="mw-setting-icon-wrap mw-setting-icon-wrap--amber">🔔</div>
+              <div class="mw-setting-text">
+                <div class="mw-setting-name">Notifications</div>
+                <div class="mw-setting-desc">Manage your alert preferences</div>
+              </div>
+              <svg class="mw-setting-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+
+            <button type="button" class="mw-setting-row" (click)="openPrivacyModal()">
+              <div class="mw-setting-icon-wrap mw-setting-icon-wrap--blue">🔒</div>
+              <div class="mw-setting-text">
+                <div class="mw-setting-name">Privacy</div>
+                <div class="mw-setting-desc">Control your data visibility</div>
+              </div>
+              <svg class="mw-setting-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+
+            <button type="button" class="mw-setting-row" (click)="openEcoModal()">
+              <div class="mw-setting-icon-wrap mw-setting-icon-wrap--green">🌿</div>
+              <div class="mw-setting-text">
+                <div class="mw-setting-name">Eco Preferences</div>
+                <div class="mw-setting-desc">Customize your impact settings</div>
+              </div>
+              <svg class="mw-setting-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div class="mw-card mw-card--full">
+      <div class="mw-card-header">
+        <div class="mw-card-title">
+          <span class="mw-card-title-icon">🕐</span>
+          <span>Activity History</span>
+        </div>
+        <div class="mw-card-header-actions">
+          <span class="mw-pill">{{ profile?.history?.length || 0 }} transactions</span>
+          <button type="button" class="mw-btn mw-btn-ghost mw-btn-sm" (click)="goToTransactions()">
+            View Transactions
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="!profile.history?.length" class="mw-empty">
+        <div class="mw-empty-emoji">📦</div>
+        <h4>No activity yet</h4>
+        <p>Your donations and purchases will appear here once you get started.</p>
+      </div>
+
+      <div *ngIf="profile.history?.length" class="mw-timeline">
+        <div *ngFor="let t of profile.history" class="mw-timeline-item">
+          <div class="mw-timeline-dot" [ngClass]="{
+            'mw-timeline-dot--donation': t.kind === 'DONATION',
+            'mw-timeline-dot--purchase': t.kind === 'PURCHASE'
+          }"></div>
+
+          <div class="mw-timeline-card">
+            <div class="mw-timeline-top">
+              <span class="mw-timeline-title">{{ t?.item?.title ?? 'Untitled Item' }}</span>
+              <span class="mw-timeline-date">{{ t?.createdAt | date:'MMM d, y' }}</span>
+            </div>
+
+            <div class="mw-timeline-tags">
+              <span class="mw-tag" [ngClass]="{
+                'mw-tag--owner': t.role === 'OWNER',
+                'mw-tag--receiver': t.role === 'RECEIVER'
+              }">{{ t?.role }}</span>
+
+              <span class="mw-tag" [ngClass]="{
+                'mw-tag--completed': t.status === 'COMPLETED',
+                'mw-tag--pending': t.status === 'PENDING',
+                'mw-tag--canceled': t.status === 'CANCELED'
+              }">{{ t?.status }}</span>
+
+              <span class="mw-tag mw-tag--neutral">Qty {{ t?.quantity ?? 0 }}</span>
+              <span class="mw-tag mw-tag--neutral">{{ t?.item?.type }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL : NOTIFICATIONS -->
+<div *ngIf="showNotifModal" class="mw-modal-overlay" (click)="closeNotifModal()">
+  <div class="mw-modal" (click)="$event.stopPropagation()">
+    <div class="mw-modal-header">
+      <h3>🔔 Notification Preferences</h3>
+      <button class="mw-modal-close" (click)="closeNotifModal()">✕</button>
+    </div>
+
+    <div class="mw-modal-body">
+      <div class="mw-toggle-row">
+        <div class="mw-toggle-label">
+          <div class="mw-toggle-title">Reservation Created</div>
+          <div class="mw-toggle-desc">Get notified when someone reserves your item</div>
+        </div>
+        <label class="mw-toggle">
+          <input type="checkbox" [(ngModel)]="tempNotifPrefs.reservationCreated">
+          <span class="mw-toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="mw-toggle-row">
+        <div class="mw-toggle-label">
+          <div class="mw-toggle-title">Reservation Canceled</div>
+          <div class="mw-toggle-desc">Get notified when a reservation is canceled</div>
+        </div>
+        <label class="mw-toggle">
+          <input type="checkbox" [(ngModel)]="tempNotifPrefs.reservationCanceled">
+          <span class="mw-toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="mw-toggle-row">
+        <div class="mw-toggle-label">
+          <div class="mw-toggle-title">Badge Earned</div>
+          <div class="mw-toggle-desc">Get notified when you earn a new badge</div>
+        </div>
+        <label class="mw-toggle">
+          <input type="checkbox" [(ngModel)]="tempNotifPrefs.badgeEarned">
+          <span class="mw-toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="mw-modal-footer">
+      <button class="mw-btn mw-btn-ghost" (click)="closeNotifModal()" [disabled]="savingNotif">Cancel</button>
+      <button class="mw-btn mw-btn-primary" (click)="saveNotifPrefs()" [disabled]="savingNotif">
+        {{ savingNotif ? 'Saving…' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL : PRIVACY -->
+<div *ngIf="showPrivacyModal" class="mw-modal-overlay" (click)="closePrivacyModal()">
+  <div class="mw-modal" (click)="$event.stopPropagation()">
+    <div class="mw-modal-header">
+      <h3>🔒 Privacy Settings</h3>
+      <button class="mw-modal-close" (click)="closePrivacyModal()">✕</button>
+    </div>
+
+    <div class="mw-modal-body">
+      <div class="mw-toggle-row">
+        <div class="mw-toggle-label">
+          <div class="mw-toggle-title">Show Email</div>
+          <div class="mw-toggle-desc">Make your email visible to other users</div>
+        </div>
+        <label class="mw-toggle">
+          <input type="checkbox" [(ngModel)]="tempPrivacySettings.showEmail">
+          <span class="mw-toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="mw-toggle-row">
+        <div class="mw-toggle-label">
+          <div class="mw-toggle-title">Show Phone</div>
+          <div class="mw-toggle-desc">Make your phone number visible to other users</div>
+        </div>
+        <label class="mw-toggle">
+          <input type="checkbox" [(ngModel)]="tempPrivacySettings.showPhone">
+          <span class="mw-toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="mw-toggle-row">
+        <div class="mw-toggle-label">
+          <div class="mw-toggle-title">Show History</div>
+          <div class="mw-toggle-desc">Display your transaction history on your profile</div>
+        </div>
+        <label class="mw-toggle">
+          <input type="checkbox" [(ngModel)]="tempPrivacySettings.showHistory">
+          <span class="mw-toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="mw-toggle-row">
+        <div class="mw-toggle-label">
+          <div class="mw-toggle-title">Show Badges</div>
+          <div class="mw-toggle-desc">Display your earned badges on your profile</div>
+        </div>
+        <label class="mw-toggle">
+          <input type="checkbox" [(ngModel)]="tempPrivacySettings.showBadges">
+          <span class="mw-toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="mw-modal-footer">
+      <button class="mw-btn mw-btn-ghost" (click)="closePrivacyModal()" [disabled]="savingPrivacy">Cancel</button>
+      <button class="mw-btn mw-btn-primary" (click)="savePrivacySettings()" [disabled]="savingPrivacy">
+        {{ savingPrivacy ? 'Saving…' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL : ECO -->
+<div *ngIf="showEcoModal" class="mw-modal-overlay" (click)="closeEcoModal()">
+  <div class="mw-modal" (click)="$event.stopPropagation()">
+    <div class="mw-modal-header">
+      <h3>🌿 Eco Preferences</h3>
+      <button class="mw-modal-close" (click)="closeEcoModal()">✕</button>
+    </div>
+
+    <div class="mw-modal-body">
+      <p class="mw-modal-info">These preferences will be available soon. Stay tuned!</p>
+
+      <div class="mw-toggle-row">
+        <div class="mw-toggle-label">
+          <div class="mw-toggle-title">Receive Eco Insights</div>
+          <div class="mw-toggle-desc">Get tips on reducing waste and maximizing impact</div>
+        </div>
+        <label class="mw-toggle">
+          <input type="checkbox" [(ngModel)]="tempEcoPrefs.receiveEcoInsights" disabled>
+          <span class="mw-toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="mw-toggle-row">
+        <div class="mw-toggle-label">
+          <div class="mw-toggle-title">Track Impact</div>
+          <div class="mw-toggle-desc">Monitor your environmental contribution</div>
+        </div>
+        <label class="mw-toggle">
+          <input type="checkbox" [(ngModel)]="tempEcoPrefs.trackImpact" disabled>
+          <span class="mw-toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="mw-toggle-row">
+        <div class="mw-toggle-label">
+          <div class="mw-toggle-title">Receive Recommendations</div>
+          <div class="mw-toggle-desc">Get personalized suggestions for donations</div>
+        </div>
+        <label class="mw-toggle">
+          <input type="checkbox" [(ngModel)]="tempEcoPrefs.receiveRecommendations" disabled>
+          <span class="mw-toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="mw-modal-footer">
+      <button class="mw-btn mw-btn-ghost" (click)="closeEcoModal()">Close</button>
+    </div>
+  </div>
+</div>

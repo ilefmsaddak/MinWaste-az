@@ -1,0 +1,245 @@
+# ========================
+# NODE.JS / NPM / YARN / PNPM
+# ========================
+node_modules/
+**/node_modules/
+yarn.lock
+pnpm-lock.yaml
+npm-debug.log*
+npm-error.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+lerna-debug.log*
+.npmrc
+.yarn/cache/
+.yarn/install-state.gz
+.package-lock.json
+**/.package-lock.json
+
+# ========================
+# BUILD & DISTRIBUTION
+# ========================
+dist/
+**/dist/
+build/
+**/build/
+.angular/
+**/.angular/
+*.swc
+out/
+.webpack/
+webpack-cache/
+*.tsbuildinfo
+**/*.tsbuildinfo
+
+# ========================
+# ENVIRONMENT & SECRETS
+# ========================
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.staging
+.env.test
+backend/.env
+frontend/.env
+secrets/
+**/secrets/
+firebase.json
+**/firebase.json
+google-services.json
+GoogleService-Info.plist
+*.p12
+*.key
+*.pem
+private-key.json
+!.env.example
+
+# ========================
+# LOGS & OUTPUT
+# ========================
+logs/
+log/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+debug.log
+.debug
+
+# ========================
+# TESTING & COVERAGE
+# ========================
+coverage/
+.nyc_output/
+*.lcov
+.mocharc.json
+test-results/
+e2e-coverage/
+.c8report/
+
+# ========================
+# IDE & EDITORS
+# ========================
+.vscode/
+!.vscode/extensions.json
+.vscode/launch.json
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+.project
+.classpath
+.c9/
+*.tern-port
+.eslintcache
+jsconfig.json.debug
+
+# ========================
+# OS & SYSTEM FILES
+# ========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+.AppleDouble
+.LSOverride
+.apdisk
+
+# ========================
+# TEMPORARY & BACKUP FILES
+# ========================
+*.tmp
+*.temp
+*.bak
+*.backup
+*-old.*
+*-backup.*
+.cache
+.parcel-cache
+.next
+*.swp
+*~
+
+# ========================
+# DATABASE & LOCAL DATA
+# ========================
+*.db
+*.sqlite
+*.sqlite3
+postgres-data/
+mysql-data/
+mongodb-data/
+prisma/*.db
+
+# ========================
+# GENERATED/LOCAL UPLOADS & MEDIA
+# ========================
+uploads/
+**/uploads/
+public/uploads/
+temp/
+tmp/
+*.temp.*
+
+# ========================
+# PRISMA
+# ========================
+prisma/client/
+prisma/*.db
+# Keep: prisma/migrations/ and prisma/schema.prisma
+
+# ========================
+# ANGULAR SPECIFIC
+# ========================
+.angular/cache/
+/dist/
+/bazel-out
+/integration/bazel/bazel-execroot
+
+# ========================
+# NESTJS SPECIFIC
+# ========================
+/dist
+/.env
+
+# ========================
+# CACHES
+# ========================
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_esm/
+.rts2_cache_umd/
+.turbo/
+.history/
+.vuepress/dist
+
+# ========================
+# DOCUMENTATION (GENERATED/TEMPORARY)
+# ========================
+# Keep only README.md - ignore all generated docs from work sessions
+*SUMMARY.md
+*GUIDE.md
+*ANALYSIS.md
+*AUDIT*.md
+*IMPLEMENTATION*.md
+MIGRATION_*.md
+*MIGRATION*.md
+DEPLOYMENT_*.md
+TRANSACTION_*.md
+POINTS_*.md
+GAMIFICATION_*.md
+RECOMMENDATION_*.md
+CODE_EXAMPLES_*.md
+API_RESPONSES_*.md
+APPLICATION_*.md
+POSTGRESQL_*.md
+COMMENT-LANCER*.md
+00_FINAL_*.md
+DOCUMENTATION_INDEX.md
+GITHUB_PREP_SUMMARY.md
+GITHUB_QUICKSTART_FR.md
+GIT_COMMANDS.ps1
+SECURITY_CHECKLIST.md
+!README.md
+# ========================
+# AWS & CLOUD CREDENTIALS
+# ========================
+.aws/
+.env.aws
+aws-exports.js
+amplifyrc.json
+
+# ========================
+# EDITOR & DEBUG
+# ========================
+.vscode-test
+.vscode-test.log
+.vscode/*.log
+.prettierignore-generated
+
+# ========================
+# LOCAL DEVELOPMENT
+# ========================
+.env.local
+.env.*.local
+.localrc
+.devcontainer/
+secrets.json
+.secrets
+
+# ========================
+# Flutter (if used)
+# ========================
+**/.dart_tool/

@@ -1,0 +1,342 @@
+.buy-page {
+  padding: 90px 2rem 2rem;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.filters-panel {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  position: sticky;
+  top: 84px;
+
+  .filters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+
+    h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #111827;
+    }
+
+    .reset-btn {
+      border: 1px solid #d1d5db;
+      background: white;
+      color: #374151;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  }
+
+  .filter-group {
+    &:not(:last-child) {
+      margin-bottom: 1.1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #f0f2f5;
+    }
+
+    h3 {
+      margin: 0 0 0.6rem;
+      font-size: 0.95rem;
+      color: #1f2937;
+    }
+
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.92rem;
+      color: #374151;
+      margin-bottom: 0.4rem;
+    }
+
+    input[type='text'],
+    input[type='number'] {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 0.5rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+
+      &:focus {
+        border-color: #4ade80;
+      }
+    }
+
+    .price-range {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+  }
+}
+
+.products-panel {
+  min-width: 0;
+
+  .products-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+
+    h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      color: #111827;
+    }
+
+    .results-count {
+      color: #6b7280;
+      font-size: 0.95rem;
+    }
+  }
+
+  .search-bar {
+    margin-bottom: 1rem;
+
+    input {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 0.65rem 0.8rem;
+      font-size: 0.92rem;
+      color: #111827;
+      background: #ffffff;
+      outline: none;
+
+      &:focus {
+        border-color: #4ade80;
+        box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.18);
+      }
+    }
+  }
+}
+
+.status-message {
+  background: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  color: #374151;
+
+  &.error {
+    color: #b91c1c;
+    border-color: #fecaca;
+    background: #fef2f2;
+  }
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.product-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .product-image {
+    position: relative;
+    height: 180px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .status-badge {
+      position: absolute;
+      left: 0.6rem;
+      top: 0.6rem;
+      font-size: 0.75rem;
+      border-radius: 999px;
+      padding: 0.2rem 0.55rem;
+      background: #e5e7eb;
+      color: #1f2937;
+
+      &.status-pending {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      &.status-unavailable,
+      &.status-expired {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+    }
+  }
+
+  .product-content {
+    padding: 0.85rem;
+
+    .product-category {
+      font-size: 0.75rem;
+      color: #6b7280;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .product-title {
+      margin: 0 0 0.35rem;
+      font-size: 1rem;
+      color: #111827;
+    }
+
+    .seller-row {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      border: 1px solid #dcfce7;
+      background: linear-gradient(135deg, #f0fdf4, #f9fafb);
+      border-radius: 10px;
+      padding: 0.45rem 0.5rem;
+      margin-bottom: 0.5rem;
+
+      .seller-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #14532d;
+        background: #bbf7d0;
+        flex-shrink: 0;
+      }
+
+      .seller-meta {
+        min-width: 0;
+
+        .seller-name {
+          margin: 0;
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: #1f2937;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .seller-rating {
+          margin-top: 0.12rem;
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 0.25rem;
+
+          .rating-value {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: #111827;
+          }
+
+          .rating-stars {
+            display: inline-flex;
+            gap: 0.03rem;
+            font-size: 0.72rem;
+
+            span {
+              color: #9ca3af;
+
+              &.filled {
+                color: #f59e0b;
+              }
+            }
+          }
+
+          .rating-count {
+            font-size: 0.72rem;
+            color: #6b7280;
+          }
+        }
+      }
+    }
+
+    .product-location {
+      margin: 0 0 0.75rem;
+      font-size: 0.85rem;
+      color: #4b5563;
+    }
+
+    .product-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+
+      .price-free {
+        background: #dcfce7;
+        color: #166534;
+        border-radius: 999px;
+        padding: 0.2rem 0.55rem;
+        font-size: 0.8rem;
+      }
+
+      .price-info {
+        display: flex;
+        flex-direction: column;
+
+        .price-amount {
+          font-weight: 700;
+          color: #111827;
+          font-size: 0.92rem;
+        }
+
+        .price-type {
+          color: #6b7280;
+          font-size: 0.75rem;
+        }
+      }
+
+      .product-time {
+        color: #6b7280;
+        font-size: 0.8rem;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .buy-page {
+    grid-template-columns: 1fr;
+    padding-top: 80px;
+  }
+
+  .filters-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .buy-page {
+    padding-top: 1rem;
+    padding-bottom: 84px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

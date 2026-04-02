@@ -1,0 +1,96 @@
+<!-- Desktop Top Navbar -->
+<nav class="navbar-desktop">
+  <div class="navbar-container">
+    <div class="navbar-logo">
+      <img src="/logo.svg" alt="MinWaste" class="logo-icon">
+      <span class="logo-text">MinWaste</span>
+    </div>
+
+    <nav class="navbar-menu-wrap" aria-label="Navigation principale">
+      <span class="navbar-menu-label">Menu</span>
+      <ul class="navbar-menu">
+        <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">Home</a></li>
+        <li><a routerLink="/buy" routerLinkActive="active" class="nav-link">Buy</a></li>
+        <li><a routerLink="/announce-history" routerLinkActive="active" class="nav-link">Mes annonces</a></li>
+        <li><a routerLink="/create-announce" routerLinkActive="active" class="nav-link">Sell</a></li>
+        <li><a routerLink="/map" routerLinkActive="active" class="nav-link">Map</a></li>
+        <li>
+          <a routerLink="/messages" routerLinkActive="active" class="nav-link messages-nav-link">
+            Messages
+            @if (unreadMessagesCount() > 0) {
+              <span class="messages-badge">{{ unreadMessagesCount() }}</span>
+            }
+          </a>
+        </li>
+        <li><a routerLink="/notifications" routerLinkActive="active" class="nav-link">Notifications</a></li>
+        @if (isAdmin()) {
+          <li>
+            <a routerLink="/admin" routerLinkActive="active" class="nav-link nav-link--admin">Administration</a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <div class="navbar-user" (click)="toggleUserMenu()">
+      <div class="user-avatar">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+        </svg>
+      </div>
+      <span class="user-name">Hello, User</span>
+      <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M7 10l5 5 5-5z"/>
+      </svg>
+      
+      @if (userMenuOpen()) {
+        <div class="user-dropdown">
+          <a routerLink="/profile" class="dropdown-item" (click)="userMenuOpen.set(false)">Profile</a>
+          <a routerLink="/profile/edit" class="dropdown-item" (click)="userMenuOpen.set(false)">Settings</a>
+          @if (isAdmin()) {
+            <a routerLink="/admin" class="dropdown-item" (click)="userMenuOpen.set(false)">Administration</a>
+          }
+          <button type="button" class="dropdown-item dropdown-item--btn" (click)="logout()">Logout</button>
+        </div>
+      }
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Bottom Navigation -->
+<nav class="navbar-mobile">
+  <ul class="mobile-nav-menu">
+    @for (item of navItems(); track item.route) {
+      <li>
+        <a 
+          [routerLink]="item.route" 
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: item.route === '/'}"
+          class="mobile-nav-link"
+          [class.mobile-nav-messages]="item.route === '/messages'"
+        >
+          <span class="mobile-nav-icon">{{ getIcon(item.icon) }}</span>
+          @if (item.route === '/messages' && unreadMessagesCount() > 0) {
+            <span class="messages-badge mobile-badge">{{ unreadMessagesCount() }}</span>
+          }
+          <span class="mobile-nav-label">{{ item.label }}</span>
+        </a>
+      </li>
+    }
+    <li>
+      <button (click)="toggleUserMenu()" class="mobile-nav-link mobile-nav-profile" [class.active]="userMenuOpen()">
+        <span class="mobile-nav-icon">👤</span>
+        <span class="mobile-nav-label">Profile</span>
+      </button>
+      @if (userMenuOpen()) {
+        <div class="mobile-profile-dropdown">
+          <a routerLink="/profile" class="mobile-dropdown-item" (click)="userMenuOpen.set(false)">Profile</a>
+          <a routerLink="/profile/edit" class="mobile-dropdown-item" (click)="userMenuOpen.set(false)">Settings</a>
+          @if (isAdmin()) {
+            <a routerLink="/admin" class="mobile-dropdown-item" (click)="userMenuOpen.set(false)">Administration</a>
+          }
+          <button type="button" class="mobile-dropdown-item mobile-dropdown-item--btn" (click)="logout()">Logout</button>
+        </div>
+      }
+    </li>
+  </ul>
+</nav>

@@ -1,0 +1,93 @@
+<!-- Admin Top Navbar -->
+<nav class="admin-navbar-desktop">
+  <div class="navbar-container">
+    <div class="navbar-logo">
+      <img src="/logo.svg" alt="MinWaste Admin" class="logo-icon">
+      <span class="logo-text">MinWaste <span class="admin-badge">Admin</span></span>
+    </div>
+
+    <ul class="navbar-menu">
+      @for (item of adminNavItems; track item.route) {
+        <li>
+          <a 
+            [routerLink]="item.route" 
+            routerLinkActive="active" 
+            [routerLinkActiveOptions]="{ exact: item.route === '/admin' }"
+            class="nav-link"
+          >
+            <span class="nav-icon">{{ item.icon }}</span>
+            {{ item.label }}
+          </a>
+        </li>
+      }
+    </ul>
+
+    <div class="navbar-actions">
+      <button (click)="backToApp()" class="back-btn" title="Back to Main App">
+        ← Back to App
+      </button>
+
+      <div class="navbar-user" (click)="toggleUserMenu()">
+        <div class="user-avatar">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+          </svg>
+        </div>
+        <span class="user-name">Admin</span>
+        <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 10l5 5 5-5z"/>
+        </svg>
+        
+        @if (userMenuOpen()) {
+          <div class="user-dropdown">
+            <a routerLink="/profile" class="dropdown-item" (click)="userMenuOpen.set(false)">Profile</a>
+            <a routerLink="/profile/edit" class="dropdown-item" (click)="userMenuOpen.set(false)">Settings</a>
+            <button type="button" class="dropdown-item dropdown-item--btn logout" (click)="logout()">Logout</button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" (click)="toggleSidebar()">
+      @if (!sidebarOpen()) {
+        <span>☰</span>
+      } @else {
+        <span>✕</span>
+      }
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Sidebar -->
+@if (sidebarOpen()) {
+  <nav class="admin-navbar-mobile">
+    <div class="mobile-nav-header">
+      <h3>Navigation</h3>
+      <button (click)="toggleSidebar()" class="close-btn">✕</button>
+    </div>
+
+    <ul class="mobile-nav-menu">
+      @for (item of adminNavItems; track item.route) {
+        <li>
+          <a 
+            [routerLink]="item.route" 
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.route === '/admin' }"
+            class="mobile-nav-link"
+            (click)="toggleSidebar()"
+          >
+            <span class="nav-icon">{{ item.icon }}</span>
+            <span class="nav-label">{{ item.label }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+
+    <div class="mobile-nav-footer">
+      <button (click)="backToApp(); toggleSidebar()" class="back-btn-mobile">
+        ← Back to App
+      </button>
+    </div>
+  </nav>
+}

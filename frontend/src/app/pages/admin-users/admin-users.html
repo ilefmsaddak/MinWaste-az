@@ -1,0 +1,135 @@
+<div class="admin-users">
+  <div class="page-header">
+    <h1>User Management</h1>
+    <p class="subtitle">Manage users, suspend or delete accounts</p>
+  </div>
+
+  <div class="filters-section">
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Search by name or email..."
+        [(ngModel)]="searchQuery"
+        class="search-input"
+      >
+      <span class="search-icon">🔍</span>
+    </div>
+
+    <div class="filter-buttons">
+      <button 
+        [class.active]="filterStatus() === 'all'"
+        (click)="filterStatus.set('all')"
+        class="filter-btn"
+      >
+        All Users
+      </button>
+      <button 
+        [class.active]="filterStatus() === 'active'"
+        (click)="filterStatus.set('active')"
+        class="filter-btn"
+      >
+        Active
+      </button>
+      <button 
+        [class.active]="filterStatus() === 'suspended'"
+        (click)="filterStatus.set('suspended')"
+        class="filter-btn"
+      >
+        Suspended
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading">Loading users...</div>
+  } @else if (filteredUsers.length === 0) {
+    <div class="empty-state">
+      <p>No users found</p>
+    </div>
+  } @else {
+    <div class="users-table-container">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Announcements</th>
+            <th>Join Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of filteredUsers; track user.id) {
+            <tr [class.admin-row]="user.role === 'admin'">
+              <td class="user-name">
+                <span class="avatar">{{ user.name.charAt(0).toUpperCase() }}</span>
+                {{ user.name }}
+                @if (user.role === 'admin') {
+                  <span class="admin-badge" title="Admin user"> ADMIN</span>
+                }
+              </td>
+              <td class="user-email">{{ user.email }}</td>
+              <td>
+                <span [class]="'badge ' + getStatusBadgeClass(user.status)">
+                  {{ getStatusLabel(user.status) }}
+                </span>
+              </td>
+              <td class="announcements">{{ user.announcements || 0 }}</td>
+              <td>{{ user.joinDate | date: 'short' }}</td>
+              <td class="actions">
+                @if (user.status === 'active') {
+                  <button
+                    (click)="openActionDialog(user, 'suspend')"
+                    class="action-btn suspend-btn"
+                    title="Suspend this user"
+                  >
+                    ⚠️ Suspend
+                  </button>
+                }
+                @if (user.status === 'suspended') {
+                  <button
+                    (click)="unsuspendUser(user)"
+                    class="action-btn unsuspend-btn"
+                    title="Unsuspend this user"
+                  >
+                    ✅ Unsuspend
+                  </button>
+                }
+                <button
+                  (click)="openActionDialog(user, 'delete')"
+                  class="action-btn delete-btn"
+                  title="Delete this user"
+                >
+                  🗑️ Delete
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (showConfirmDialog()) {
+    <div class="modal-overlay">
+      <div class="modal-content">
+        <h2>Confirm {{ confirmAction() === 'suspend' ? 'Suspension' : 'Deletion' }}</h2>
+        <p class="warning-text">
+          You are about to {{ confirmAction() === 'suspend' ? 'suspend' : 'delete' }} the account of <strong>{{ selectedUser()?.name }}</strong>
+        </p>
+
+        <div class="modal-actions">
+          <button (click)="closeDialog()" class="btn btn-secondary">Cancel</button>
+          <button 
+            (click)="confirmActionDialog()" 
+            [class.danger]="confirmAction() === 'delete'"
+            class="btn btn-primary"
+          >
+            {{ confirmAction() === 'suspend' ? 'Suspend User' : 'Delete User' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

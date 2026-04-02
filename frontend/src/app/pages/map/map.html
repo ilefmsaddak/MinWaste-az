@@ -1,0 +1,18 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="map-page">
+  <header class="map-header">
+    <h1>Annonce Heat Map</h1>
+    <p>Density view of article announcements. Click a point to inspect its annonce card.</p>
+  </header>
+
+  @if (isLoading) {
+    <div class="status-message">Loading annonce locations...</div>
+  } @else if (error) {
+    <div class="status-message error">{{ error }}</div>
+  } @else if (annoncesWithLocation.length === 0) {
+    <div class="status-message">No annonces with valid coordinates were found.</div>
+  } @else {
+    <div id="annonces-map" class="map-canvas"></div>
+  }
+</div>

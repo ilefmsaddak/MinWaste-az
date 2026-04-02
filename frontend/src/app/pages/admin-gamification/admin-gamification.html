@@ -1,0 +1,169 @@
+<div class="admin-gamification">
+  <div class="page-header">
+    <h1>Gamification Management</h1>
+    <p class="subtitle">Manage badges, points, and leaderboard</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading">Loading gamification data...</div>
+  } @else {
+    <div class="stats-section">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <h3>Total Points Distributed</h3>
+          <p class="stat-number">{{ totalPoints() }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <h3>Average Points</h3>
+          <p class="stat-number">{{ averagePoints() }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-content">
+          <h3>Total Badges</h3>
+          <p class="stat-number">{{ badges().length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button
+        [class.active]="activeTab() === 'badges'"
+        (click)="setTab('badges')"
+        class="tab-btn"
+      >
+        Manage Badges
+      </button>
+      <button
+        [class.active]="activeTab() === 'leaderboard'"
+        (click)="setTab('leaderboard')"
+        class="tab-btn"
+      >
+        Leaderboard
+      </button>
+    </div>
+
+    @if (activeTab() === 'badges') {
+      <div class="tab-content">
+        <div class="badges-header">
+          <h2>Available Badges</h2>
+          <button class="btn-add-badge" (click)="openCreateBadgeForm()">+ Add New Badge</button>
+        </div>
+        
+        <div class="badges-grid">
+          @for (badge of badges(); track badge.id) {
+            <div class="badge-card">
+              <div class="badge-icon">{{ badge.icon }}</div>
+              <h3>{{ badge.name }}</h3>
+              <p class="badge-description">{{ badge.description }}</p>
+              
+              <div class="badge-info">
+                <div class="info-row">
+                  <span class="label">Points Required:</span>
+                  <span class="value">{{ badge.pointsRequired }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Users Earned:</span>
+                  <span class="value">{{ badge.usersEarned }}</span>
+                </div>
+              </div>
+
+              <div class="badge-actions">
+                <button 
+                  (click)="editBadge(badge.id)"
+                  class="action-btn edit-btn"
+                >
+                  ✏️ Edit
+                </button>
+                <button 
+                  (click)="deleteBadge(badge.id)"
+                  class="action-btn delete-btn"
+                  title="Delete this badge"
+                >
+                  🗑️ Delete
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (activeTab() === 'leaderboard') {
+      <div class="tab-content">
+        <h2>Top Users</h2>
+        <div class="leaderboard-table-container">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>User Name</th>
+                <th>Points</th>
+                <th>Badges</th>
+                <th>Level</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of leaderboard(); track user.rank) {
+                <tr [class.top-rank]="user.rank <= 3">
+                  <td class="rank-cell">
+                    @if (user.rank === 1) {
+                      <span class="medal">🥇</span>
+                    }
+                    @if (user.rank === 2) {
+                      <span class="medal">🥈</span>
+                    }
+                    @if (user.rank === 3) {
+                      <span class="medal">🥉</span>
+                    }
+                    @if (user.rank > 3) {
+                      <span class="rank-number">#{{ user.rank }}</span>
+                    }
+                  </td>
+                  <td class="user-name">{{ user.userName }}</td>
+                  <td class="points">{{ user.points }}</td>
+                  <td class="badges">{{ user.badges }}</td>
+                  <td class="level">
+                    <span [ngClass]="'level-badge level-' + (user.level | lowercase)">
+                      {{ user.level }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</div>
+
+<!-- Create Badge Form Modal -->
+<app-create-badge-form
+  [isVisible]="showCreateBadgeForm"
+  (badgeCreated)="onBadgeCreated()"
+  (closed)="closeCreateBadgeForm()"
+></app-create-badge-form>
+
+<!-- Edit Badge Form Modal -->
+<app-edit-badge-form
+  [isVisible]="showEditBadgeForm"
+  [badge]="selectedBadgeForEdit"
+  (badgeUpdated)="onBadgeUpdated()"
+  (closed)="closeEditBadgeForm()"
+></app-edit-badge-form>
+
+<!-- Delete Confirmation Dialog -->
+<app-delete-confirmation-dialog
+  [isVisible]="showDeleteConfirmation()"
+  [itemName]="badgeToDelete()?.name || ''"
+  (confirmed)="onDeleteConfirmed()"
+  (cancelled)="onDeleteCancelled()"
+></app-delete-confirmation-dialog>
