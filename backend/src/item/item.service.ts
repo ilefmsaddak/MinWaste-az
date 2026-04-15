@@ -14,6 +14,7 @@ import {
   Prisma,
 } from '@prisma/client';
 import { GamificationService } from '../gamification/gamification.service';
+import { FraudDetectionService } from './fraud-detection.service';
 
 /** Accepte `users.id` (UUID) ou `users.firebase_uid` (ex. token Firebase). */
 const PG_UUID_RE =
@@ -280,6 +281,13 @@ export class ItemService {
   async create(createItemDto: CreateItemDto, photoBlobName?: string | null) {
     const ownerDbId = await this.resolveOwnerDbId(createItemDto.ownerId);
 
+    const fraudScore = FraudDetectionService.validate(
+      createItemDto.title,
+      createItemDto.description ?? '',
+      ownerDbId,
+      this.prisma,
+    );
+    
     const status = toItemStatus(createItemDto.status as unknown as string);
     const priceType = createItemDto.priceType as price_type;
     const priceAmount =
@@ -340,8 +348,11 @@ export class ItemService {
     return this.enrichItemWithPhotoUrls(full);
   }
 
-  async findAll() {
-    const items = await this.prisma.items.findMany({
+  async findAll(filter?: string, userLat?: string, userLng?: string) {
+    const lat = userLat ? parseFloat(userLat) : null;
+    const lng = userLng ? parseFloat(userLng) : null;
+
+    let items = await this.prisma.items.findMany({
       include: {
         users: {
           select: {
@@ -349,12 +360,63 @@ export class ItemService {
             display_name: true,
             email: true,
             phone: true,
+            points: true,
           },
         },
         item_photos: true,
       },
     });
+
+    // Strategy 1: Popular (By Owner Points, unique owner)
+    if (filter === 'popular') {
+      // 1. Sort all items by owner points descending first
+      items.sort((a, b) => (b.users?.points || 0) - (a.users?.points || 0));
+      
+      const uniqueOwners = new Map();
+      items.forEach(item => {
+        // Only keep the first (highest points) announce found for this owner
+        if (!uniqueOwners.has(item.owner_id)) {
+          uniqueOwners.set(item.owner_id, item);
+        }
+      });
+      items = Array.from(uniqueOwners.values());
+    }
+
+    // Strategy 2: Just Now (Today's announcements)
+    if (filter === 'just-now') {
+      const today = new Date();
+      // Use 24h window for "Just Now"
+      const twentyFourHoursAgo = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+      items = items.filter(item => new Date(item.created_at) >= twentyFourHoursAgo);
+      // Explicit newest first
+      items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+
+    // Strategy 3: Near You (Diameter 50km)
+    if (filter === 'near-you' && lat !== null && lng !== null) {
+      items = items.filter(item => {
+        const itemLat = Number(item.lat);
+        const itemLng = Number(item.lng);
+        const distance = this.calculateDistance(lat, lng, itemLat, itemLng);
+        (item as any).distance = distance;
+        return distance <= 50; // 50km
+      });
+      items.sort((a, b) => (a as any).distance - (b as any).distance);
+    }
+
     return this.enrichItemsWithPhotoUrls(items);
+  }
+
+  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Earth radius in km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   }
 
   async findOne(id: string) {

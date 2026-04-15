@@ -17,16 +17,16 @@
   <div class="main-layout">
     <div class="cards-section">
       @if (activeSection() === 'for-you') {
-        <app-annonce-cards [sectionTitle]="'For You'" [sectionId]="'for-you-section'"></app-annonce-cards>
+        <app-annonce-cards [sectionTitle]="'For You'" [sectionId]="'for-you'"></app-annonce-cards>
       }
       @if (activeSection() === 'near-you') {
-        <app-annonce-cards [sectionTitle]="'Near You'" [sectionId]="'near-you-section'"></app-annonce-cards>
+        <app-annonce-cards [sectionTitle]="'Near You'" [sectionId]="'near-you'"></app-annonce-cards>
       }
       @if (activeSection() === 'popular') {
-        <app-annonce-cards [sectionTitle]="'Popular'" [sectionId]="'popular-section'"></app-annonce-cards>
+        <app-annonce-cards [sectionTitle]="'Popular'" [sectionId]="'popular'"></app-annonce-cards>
       }
       @if (activeSection() === 'just-now') {
-        <app-annonce-cards [sectionTitle]="'Just Now'" [sectionId]="'just-now-section'"></app-annonce-cards>
+        <app-annonce-cards [sectionTitle]="'Just Now'" [sectionId]="'just-now'"></app-annonce-cards>
       }
     </div>
     <div class="leaderboard-section">

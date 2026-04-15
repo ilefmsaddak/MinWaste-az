@@ -132,16 +132,6 @@
             <p class="seller-rating-meta">Based on trust score (profile)</p>
           </div>
 
-          <div class="trust-meter">
-            <p class="trust-title">Trust score</p>
-            <div class="meter-track">
-              <div class="meter-fill" [style.width.%]="getFraudPercent(annonce.fraudScore)"></div>
-            </div>
-            <p class="trust-meta">
-              Fraud score: {{ annonce.fraudScore ?? 0 }} · {{ getFraudLevel(annonce.fraudScore) }} risk
-            </p>
-          </div>
-
           @if (annonce.owner?.badges && annonce.owner?.badges?.length) {
             <div class="badge-list">
               @for (badge of annonce.owner?.badges; track badge) {

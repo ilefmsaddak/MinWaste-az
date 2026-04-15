@@ -51,53 +51,76 @@ export class AnnonceCards implements OnInit {
     this.isLoading.set(true);
     this.error.set(null);
 
-    console.log('📡 Fetching items from REST API...');
+    console.log(`📡 Fetching items for section: ${this.sectionId || 'all'}...`);
 
-    this.itemService.getAllItems().subscribe({
-      next: (data: ItemResponse[]) => {
-        console.log('✅ Items loaded:', data);
-        
-        // Get current user ID from localStorage
-        const currentUserId = localStorage.getItem('userId');
-        
-        // Filter out user's own items
-        const mappedData: AnnonceData[] = data
-          .filter(item => {
-            // Hide user's own items from the marketplace
-            if (currentUserId && item.ownerId === currentUserId) {
-              console.log('🔒 Hiding own item:', item.id, item.title);
-              return false;
-            }
-            return true;
-          })
-          .map((item) => ({
-            id: item.id,
-            title: item.title,
-            description: item.description,
-            category: item.category,
-            location: { addr: item.locationAddr },
-            // API Prisma : enums en majuscules (FREE, PUBLISHED) — normaliser pour le template
-            status: String(item.status ?? '').toLowerCase(),
-            priceType: String(item.priceType ?? '').toLowerCase(),
-            priceAmount: item.priceValue,
-            quantity: item.quantity,
-            quantityAvailable: item.quantityAvailable,
-            createdAt: item.createdAt,
-            expiresAt: item.expiresAt,
-            photos: item.photos ?? [],
-          }));
-        this.annonces.set(mappedData);
-        this.isLoading.set(false);
-      },
-      error: (err: any) => {
-        console.error('❌ Error loading items:', err);
-        console.error('Error message:', err.message);
-        console.error('Network error:', err.error);
-        
-        this.error.set(`Failed to load announcements: ${err.message || 'Unknown error'}`);
-        this.isLoading.set(false);
-      },
-    });
+    let lat: number | undefined;
+    let lng: number | undefined;
+
+    const fetchItems = () => {
+      this.itemService.getAllItems(this.sectionId, lat, lng).subscribe({
+        next: (data: ItemResponse[]) => {
+          console.log(`✅ Items loaded for ${this.sectionId}:`, data.length);
+          
+          // Get current user ID from localStorage
+          const currentUserId = localStorage.getItem('userId');
+          
+          // Filter out user's own items
+          const mappedData: AnnonceData[] = data
+            .filter(item => {
+              // Hide user's own items from the marketplace
+              if (currentUserId && item.ownerId === currentUserId) {
+                return false;
+              }
+              return true;
+            })
+            .map((item) => ({
+              id: item.id,
+              title: item.title,
+              description: item.description,
+              category: item.category,
+              location: { addr: item.locationAddr },
+              status: String(item.status ?? '').toLowerCase(),
+              priceType: String(item.priceType ?? '').toLowerCase(),
+              priceAmount: item.priceValue,
+              quantity: item.quantity,
+              quantityAvailable: item.quantityAvailable,
+              createdAt: item.createdAt,
+              expiresAt: item.expiresAt,
+              photos: item.photos ?? [],
+            }));
+          this.annonces.set(mappedData);
+          this.isLoading.set(false);
+        },
+        error: (err: any) => {
+          console.error(`❌ Error loading items for ${this.sectionId}:`, err);
+          this.error.set(`Failed to load announcements: ${err.message || 'Unknown error'}`);
+          this.isLoading.set(false);
+        },
+      });
+    };
+
+    if (this.sectionId === 'near-you') {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+            console.log(`📍 Geolocation active: ${lat}, ${lng}`);
+            fetchItems();
+          },
+          (err) => {
+            console.warn('⚠️ Geolocation blocked or failed, loading all:', err.message);
+            fetchItems();
+          },
+          { timeout: 5000 }
+        );
+      } else {
+        console.warn('⚠️ Geolocation not supported');
+        fetchItems();
+      }
+    } else {
+      fetchItems();
+    }
   }
 
   getPhotoUrl(annonce: AnnonceData): string {

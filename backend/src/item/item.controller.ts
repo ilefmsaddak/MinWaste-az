@@ -11,6 +11,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -63,8 +64,12 @@ export class ItemController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  findAll() {
-    return this.itemService.findAll();
+  findAll(
+    @Query('filter') filter?: string,
+    @Query('lat') lat?: string,
+    @Query('lng') lng?: string,
+  ) {
+    return this.itemService.findAll(filter, lat, lng);
   }
 
   @Get('owner/:ownerId')

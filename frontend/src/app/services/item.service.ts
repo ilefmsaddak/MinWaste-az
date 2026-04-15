@@ -136,10 +136,18 @@ export class ItemService {
   }
 
  
-  getAllItems(): Observable<ItemResponse[]> {
-    return this.http.get<ItemResponse[]>(
-      this.apiService.getItemsEndpoint()
-    );
+  getAllItems(filter?: string, lat?: number, lng?: number): Observable<ItemResponse[]> {
+    let endpoint = this.apiService.getItemsEndpoint();
+    const params: string[] = [];
+    if (filter) params.push(`filter=${filter}`);
+    if (lat !== undefined) params.push(`lat=${lat}`);
+    if (lng !== undefined) params.push(`lng=${lng}`);
+    
+    if (params.length > 0) {
+      endpoint += '?' + params.join('&');
+    }
+
+    return this.http.get<ItemResponse[]>(endpoint);
   }
 
   /**
