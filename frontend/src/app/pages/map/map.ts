@@ -188,7 +188,7 @@ export class MapPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getPhotoUrl(photos: string[]): string {
-    return photos.length > 0 ? photos[0] : 'assets/placeholder.jpg';
+    return photos.length > 0 ? photos[0] : 'assets/banner.jpg';
   }
 
   getStatusLabel(status: string): string {

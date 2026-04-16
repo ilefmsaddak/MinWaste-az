@@ -71,6 +71,9 @@ const GET_BROWSING_HISTORY = gql`
   providedIn: 'root',
 })
 export class RecommendationsService {
+  /** ✅ Persist recommended IDs across component lifecycle (survives navigation) */
+  private readonly sessionRecommendedIds = new Set<string>();
+
   constructor(
     private apollo: Apollo,
     private auth: FirebaseAuthService,
@@ -149,5 +152,28 @@ export class RecommendationsService {
       console.error('Failed to get browsing history:', err);
       return [];
     }
+  }
+
+  /**
+   * ✅ Mark an item as recommended for the current session
+   * Persists across component lifecycle (survives navigation)
+   */
+  markAsRecommended(itemId: string): void {
+    this.sessionRecommendedIds.add(itemId);
+  }
+
+  /**
+   * ✅ Check if an item was recommended during this session
+   * Returns true if the item was marked as recommended at any point
+   */
+  wasRecommended(itemId: string): boolean {
+    return this.sessionRecommendedIds.has(itemId);
+  }
+
+  /**
+   * ✅ Clear session recommended IDs (optional, for logout or reset)
+   */
+  clearSessionRecommendations(): void {
+    this.sessionRecommendedIds.clear();
   }
 }

@@ -29,6 +29,9 @@
             <span class="status-badge" [ngClass]="'status-' + annonce.status.toLowerCase()">
               {{ getStatusLabel(annonce.status) }}
             </span>
+            @if (annonce.isRecommended) {
+              <span class="recommended-badge">⭐ Recommended</span>
+            }
           </div>
 
           <!-- Card Content -->

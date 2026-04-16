@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NavBar } from '../../components/nav-bar/nav-bar';
 import { FirebaseAuthService } from '../../core/auth/firebase-auth.service';
@@ -75,6 +75,7 @@ export class TransactionsPage implements OnInit {
     private reservationService: ReservationService,
     private apollo: Apollo,
     private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
@@ -83,6 +84,13 @@ export class TransactionsPage implements OnInit {
       this.error.set('User not authenticated');
       return;
     }
+
+    // Handle tab from query params
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    if (tab === 'received' || tab === 'purchases') {
+      this.activeTab.set(tab as 'received' | 'purchases');
+    }
+
     this.loadTransactions();
   }
 

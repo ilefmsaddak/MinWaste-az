@@ -39,6 +39,7 @@ const LIST = gql`
       title
       body
       isRead
+      payload
       createdAt
     }
   }
@@ -205,15 +206,66 @@ export class NotificationsPage implements OnInit {
       });
   }
 
-  /** Mark as read; open Messages for private chat notifications. */
+  /** Mark as read; handle redirection based on payload kind/page. */
   onNotifClick(n: MockNotification): void {
-    const openMessages = n.type === 'MESSAGE_RECEIVED';
-    if (openMessages) {
-      this.markRead(n.id, { reload: false });
-      void this.router.navigate(['/messages']);
+    // 1. Mark as read first (without full reload to maintain navigation speed)
+    this.markRead(n.id, { reload: false });
+
+    // 2. Extract payload if present
+    let payload: any = null;
+    if (n.payload) {
+      try {
+        payload = JSON.parse(n.payload);
+      } catch (e) {
+        console.warn('Failed to parse notification payload:', n.payload);
+      }
+    }
+
+    // 3. Priority 1: Navigation explicitly defined in payload
+    if (payload?.page) {
+      const navExtras = payload.tab ? { queryParams: { tab: payload.tab } } : {};
+      void this.router.navigate([`/${payload.page}`], navExtras);
       return;
     }
-    this.markRead(n.id);
+
+    // 4. Priority 2: Type-based fallback (for old notifications or simple ones)
+    switch (n.type) {
+      case 'MESSAGE_RECEIVED':
+        void this.router.navigate(['/messages']);
+        break;
+      
+      case 'RESERVATION_CREATED':
+        // Fallback for old reservations
+        void this.router.navigate(['/transactions'], { queryParams: { tab: 'received' } });
+        break;
+      
+      case 'RESERVATION_CONFIRMED':
+      case 'PICKUP_CONFIRMED':
+        // Confirmation notifications should lead to purchases (or received if seller, 
+        // but typically the receiver gets these alerts)
+        void this.router.navigate(['/transactions'], { queryParams: { tab: 'purchases' } });
+        break;
+      
+      case 'BADGE_EARNED':
+        // Badges are displayed on the profile page
+        void this.router.navigate(['/profile']);
+        break;
+      
+      case 'ITEM_EXPIRED':
+        // Lead to own item history
+        void this.router.navigate(['/announce-history']);
+        break;
+
+      case 'RESERVATION_CANCELED':
+        // Lead to general transactions view
+        void this.router.navigate(['/transactions']);
+        break;
+
+      default:
+        // Default safe behavior: stay here or go to safe home page if unknown
+        console.log('Notification type has no specific route:', n.type);
+        break;
+    }
   }
 
   /** Affichage lisible : BADGE_EARNED → « BADGE EARNED » */

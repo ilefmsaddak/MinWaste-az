@@ -11,13 +11,10 @@
     <app-banner (filterClick)="onFilterClick($event)"></app-banner>
   </div>
   
-  <!-- Recommendations Section -->
-  <app-recommended-items></app-recommended-items>
-  
   <div class="main-layout">
     <div class="cards-section">
       @if (activeSection() === 'for-you') {
-        <app-annonce-cards [sectionTitle]="'For You'" [sectionId]="'for-you'"></app-annonce-cards>
+        <app-annonce-cards [sectionTitle]="'For You'" [sectionId]="'for-you'" [includeRecommendations]="true"></app-annonce-cards>
       }
       @if (activeSection() === 'near-you') {
         <app-annonce-cards [sectionTitle]="'Near You'" [sectionId]="'near-you'"></app-annonce-cards>

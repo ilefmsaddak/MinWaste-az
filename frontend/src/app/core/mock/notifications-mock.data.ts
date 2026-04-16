@@ -1,9 +1,10 @@
-﻿export interface MockNotification {
+export interface MockNotification {
   id: string;
   type: string;
   title: string | null;
   body: string;
   isRead: boolean;
+  payload?: string;
   createdAt: string;
 }
 

@@ -22,7 +22,14 @@
             }
           </a>
         </li>
-        <li><a routerLink="/notifications" routerLinkActive="active" class="nav-link">Notifications</a></li>
+        <li>
+          <a routerLink="/notifications" routerLinkActive="active" class="nav-link notifications-nav-link">
+            Notifications
+            @if (unreadNotificationsCount() > 0) {
+              <span class="messages-badge">{{ unreadNotificationsCount() }}</span>
+            }
+          </a>
+        </li>
         @if (isAdmin()) {
           <li>
             <a routerLink="/admin" routerLinkActive="active" class="nav-link nav-link--admin">Administration</a>
@@ -71,6 +78,9 @@
           <span class="mobile-nav-icon">{{ getIcon(item.icon) }}</span>
           @if (item.route === '/messages' && unreadMessagesCount() > 0) {
             <span class="messages-badge mobile-badge">{{ unreadMessagesCount() }}</span>
+          }
+          @if (item.route === '/notifications' && unreadNotificationsCount() > 0) {
+            <span class="messages-badge mobile-badge">{{ unreadNotificationsCount() }}</span>
           }
           <span class="mobile-nav-label">{{ item.label }}</span>
         </a>

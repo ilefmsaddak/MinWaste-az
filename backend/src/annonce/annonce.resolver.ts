@@ -23,7 +23,7 @@ export class AnnonceResolver {
   }
 
   @Query(() => [Item], { name: 'itemsByStatus' })
-  async getItemsByStatus(@Args('status') status: item_status) {
+  async getItemsByStatus(@Args('status', { type: () => String }) status: item_status) {
     return this.annonceService.findByStatus(status);
   }
 

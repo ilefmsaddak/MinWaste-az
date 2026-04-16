@@ -1,9 +1,11 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FirebaseAuthService } from '../../core/auth/firebase-auth.service';
 import { UserRoleService } from '../../core/auth/user-role.service';
 import { MessageSocketService } from '../../services/message-socket.service';
+import { Apollo, gql } from 'apollo-angular';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-nav-bar',
@@ -11,21 +13,63 @@ import { MessageSocketService } from '../../services/message-socket.service';
   templateUrl: './nav-bar.html',
   styleUrl: './nav-bar.scss',
 })
-export class NavBar implements OnInit {
+export class NavBar implements OnInit, OnDestroy {
   userMenuOpen = signal(false);
   private readonly messageSocket = inject(MessageSocketService);
   private readonly userRole = inject(UserRoleService);
   readonly unreadMessagesCount = this.messageSocket.unreadMessagesCount;
+  readonly unreadNotificationsCount = signal(0);
   readonly isAdmin = this.userRole.isAdmin;
+  private refreshInterval: any;
 
   constructor(
     private readonly auth: FirebaseAuthService,
     private readonly router: Router,
+    private readonly apollo: Apollo,
   ) {}
 
   ngOnInit(): void {
     this.messageSocket.ensureSocketConnected();
     void this.userRole.refresh();
+    void this.refreshNotificationCount();
+
+    // Poll every 30s for minimal robust updates as requested
+    this.refreshInterval = setInterval(() => {
+      void this.refreshNotificationCount();
+    }, 30000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.refreshInterval) clearInterval(this.refreshInterval);
+  }
+
+  async refreshNotificationCount() {
+    try {
+      const token = await this.auth.getValidIdToken();
+      if (!token) return;
+
+      const UNREAD_COUNT_QUERY = gql`
+        query UnreadNotificationsCount {
+          unreadNotificationsCount
+        }
+      `;
+
+      const result = await firstValueFrom(
+        this.apollo.query<{ unreadNotificationsCount: number }>({
+          query: UNREAD_COUNT_QUERY,
+          fetchPolicy: 'network-only',
+          context: {
+            headers: { Authorization: `Bearer ${token}` } as any,
+          },
+        })
+      );
+
+      if (result.data) {
+        this.unreadNotificationsCount.set(result.data.unreadNotificationsCount);
+      }
+    } catch (err) {
+      console.error('Error refreshing notification count:', err);
+    }
   }
 
   readonly navItems = computed(() => {

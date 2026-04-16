@@ -12,6 +12,7 @@ export class NotificationGql {
   @Field({ nullable: true }) title?: string;
   @Field() body: string;
   @Field() isRead: boolean;
+  @Field({ nullable: true }) payload?: string;
   @Field(() => Date) createdAt: Date;
 }
 
@@ -33,6 +34,7 @@ export class NotificationsResolver {
       title: n.title ?? undefined,
       body: n.body,
       isRead: n.is_read,
+      payload: n.payload ? JSON.stringify(n.payload) : undefined,
       createdAt: n.created_at,
     }));
   }

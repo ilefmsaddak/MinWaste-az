@@ -161,6 +161,33 @@
   }
 }
 
+.recommended-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-transform: capitalize;
+  animation: subtle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes subtle-pulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+  }
+  50% {
+    box-shadow: 0 2px 12px rgba(251, 191, 36, 0.6);
+  }
+}
+
 .quantity-badge {
   position: absolute;
   bottom: 0.75rem;

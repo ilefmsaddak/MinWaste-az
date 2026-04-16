@@ -330,7 +330,12 @@ export class TransactionsResolver {
           type: 'RESERVATION_CREATED',
           title: 'New Reservation',
           body: `Someone reserved your item: ${item.title}`,
-          payload: { itemId, transactionId: transaction.id },
+          payload: { 
+            page: 'transactions', 
+            tab: 'received', 
+            itemId, 
+            transactionId: transaction.id 
+          },
         } as any,
       });
     }
@@ -473,6 +478,29 @@ export class TransactionsResolver {
     await this.gamification.awardConfirmDonation(tx.owner_id, tx.id);
     await this.profileService.ensureBadgesForUser(tx.owner_id);
 
+    // Notify buyer that donation is confirmed
+    const item = tx.items;
+    const buyerPrefs = await this.prisma.user_preferences.findUnique({
+      where: { user_id: tx.receiver_id },
+    });
+
+    if (buyerPrefs?.notif_reservation_updates !== false) {
+      await this.prisma.notifications.create({
+        data: {
+          receiver_id: tx.receiver_id,
+          type: 'RESERVATION_CONFIRMED',
+          title: 'Donation Confirmed',
+          body: `Your reservation for "${item?.title}" has been confirmed by the donor.`,
+          payload: { 
+            page: 'transactions', 
+            tab: 'purchases', 
+            itemId: tx.item_id, 
+            transactionId: tx.id 
+          },
+        } as any,
+      });
+    }
+
     return true;
   }
 
@@ -520,7 +548,12 @@ export class TransactionsResolver {
           type: 'RESERVATION_CONFIRMED',
           title: 'Sale Confirmed',
           body: `Your reservation for "${item?.title}" has been confirmed by the seller. Complete your purchase to finalize the transaction.`,
-          payload: { itemId: tx.item_id, transactionId: tx.id },
+          payload: { 
+            page: 'transactions', 
+            tab: 'purchases', 
+            itemId: tx.item_id, 
+            transactionId: tx.id 
+          },
         } as any,
       });
     }

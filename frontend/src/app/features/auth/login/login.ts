@@ -67,34 +67,34 @@ export class LoginPage {
 
       await this.auth.login(email, password);
 
+      // ✅ Wait for userId to be retrieved and stored BEFORE navigation
+      try {
+        const userInfo = await this.auth.getUserInfoForDB();
+        const res = await firstValueFrom(
+          this.apollo.query({
+            query: ME_QUERY,
+            fetchPolicy: 'no-cache',
+            context: {
+              headers: {
+                Authorization: `Bearer ${userInfo.token}`,
+              } as any,
+            },
+          }),
+        );
+        const dbId = (res.data as { me?: { id?: string } })?.me?.id;
+        if (dbId) {
+          localStorage.setItem('userId', dbId);
+          this.messageSocket.ensureSocketConnected();
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn('Backend user upsert failed (non-blocking):', e);
+      }
+
+      // ✅ Navigate AFTER userId is stored
       this.ngZone.run(() =>
         this.router.navigateByUrl(this.postLoginUrl(), { replaceUrl: true }),
       );
-
-      void (async () => {
-        try {
-          const userInfo = await this.auth.getUserInfoForDB();
-          const res = await firstValueFrom(
-            this.apollo.query({
-              query: ME_QUERY,
-              fetchPolicy: 'no-cache',
-              context: {
-                headers: {
-                  Authorization: `Bearer ${userInfo.token}`,
-                } as any,
-              },
-            }),
-          );
-          const dbId = (res.data as { me?: { id?: string } })?.me?.id;
-          if (dbId) {
-            localStorage.setItem('userId', dbId);
-            this.messageSocket.ensureSocketConnected();
-          }
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.warn('Backend user upsert failed (non-blocking):', e);
-        }
-      })();
    } catch (e: any) {
   console.log('FIREBASE ERROR FULL:', e);
   console.log('code:', e?.code);
@@ -112,34 +112,34 @@ export class LoginPage {
     try {
       await this.auth.loginWithGoogle();
 
+      // ✅ Wait for userId to be retrieved and stored BEFORE navigation
+      try {
+        const userInfo = await this.auth.getUserInfoForDB();
+        const res = await firstValueFrom(
+          this.apollo.query({
+            query: ME_QUERY,
+            fetchPolicy: 'no-cache',
+            context: {
+              headers: {
+                Authorization: `Bearer ${userInfo.token}`,
+              } as any,
+            },
+          }),
+        );
+        const dbId = (res.data as { me?: { id?: string } })?.me?.id;
+        if (dbId) {
+          localStorage.setItem('userId', dbId);
+          this.messageSocket.ensureSocketConnected();
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn('Backend user upsert failed (non-blocking):', e);
+      }
+
+      // ✅ Navigate AFTER userId is stored
       this.ngZone.run(() =>
         this.router.navigateByUrl(this.postLoginUrl(), { replaceUrl: true }),
       );
-
-      void (async () => {
-        try {
-          const userInfo = await this.auth.getUserInfoForDB();
-          const res = await firstValueFrom(
-            this.apollo.query({
-              query: ME_QUERY,
-              fetchPolicy: 'no-cache',
-              context: {
-                headers: {
-                  Authorization: `Bearer ${userInfo.token}`,
-                } as any,
-              },
-            }),
-          );
-          const dbId = (res.data as { me?: { id?: string } })?.me?.id;
-          if (dbId) {
-            localStorage.setItem('userId', dbId);
-            this.messageSocket.ensureSocketConnected();
-          }
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.warn('Backend user upsert failed (non-blocking):', e);
-        }
-      })();
     } catch (e: any) {
   console.log('FIREBASE ERROR FULL:', e);
   console.log('code:', e?.code);

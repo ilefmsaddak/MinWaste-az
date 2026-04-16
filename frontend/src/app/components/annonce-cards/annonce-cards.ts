@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ItemService, ItemResponse } from '../../services/item.service';
 import { SlugService } from '../../services/slug.service';
+import { RecommendationsService } from '../../services/recommendations.service';
 
 interface AnnonceData {
   id: string | number;
@@ -18,6 +19,7 @@ interface AnnonceData {
   createdAt: string;
   expiresAt?: string;
   photos?: string[];
+  isRecommended?: boolean;
 }
 
 @Component({
@@ -30,24 +32,26 @@ interface AnnonceData {
 export class AnnonceCards implements OnInit {
   @Input() sectionTitle: string = 'Announcements';
   @Input() sectionId: string = '';
-  
+  @Input() includeRecommendations: boolean = false;
+
   annonces = signal<AnnonceData[]>([]);
   isLoading = signal(false);
   error = signal<string | null>(null);
-  /** IDs dont l’URL photo est invalide / erreur de chargement → fallback logo */
+  /** IDs dont l'URL photo est invalide / erreur de chargement → fallback logo */
   private readonly brokenPhotoIds = signal(new Set<string>());
 
   constructor(
     private itemService: ItemService,
     private router: Router,
     private slugService: SlugService,
+    private recommendationsService: RecommendationsService,
   ) {}
 
   ngOnInit() {
     this.loadAnnonces();
   }
 
-  loadAnnonces() {
+  async loadAnnonces() {
     this.isLoading.set(true);
     this.error.set(null);
 
@@ -56,19 +60,58 @@ export class AnnonceCards implements OnInit {
     let lat: number | undefined;
     let lng: number | undefined;
 
-    const fetchItems = () => {
+    const fetchItems = async () => {
+      // Load recommendations first if needed
+      let recommendedItems: AnnonceData[] = [];
+      const recommendedIds = new Set<string>();
+
+      if (this.includeRecommendations && this.sectionId === 'for-you') {
+        try {
+          const recResponse = await this.recommendationsService.getRecommendations(6);
+          if (recResponse.items && recResponse.items.length > 0) {
+            recommendedItems = recResponse.items.map((item: any) => {
+              recommendedIds.add(item.id);
+              this.recommendationsService.markAsRecommended(item.id); // ✅ Persist in service (survives navigation)
+              return {
+                id: item.id,
+                title: item.title,
+                description: item.description,
+                category: item.category,
+                location: { addr: item.locationAddr || '' },
+                status: String(item.status ?? '').toLowerCase(),
+                priceType: String(item.priceType ?? '').toLowerCase(),
+                priceAmount: item.priceAmount,
+                quantity: item.quantity || 1,
+                quantityAvailable: item.quantityAvailable,
+                createdAt: item.createdAt || new Date().toISOString(),
+                expiresAt: item.expiresAt,
+                photos: item.photos ?? [],
+                isRecommended: true,
+              };
+            });
+          }
+        } catch (err) {
+          console.warn('⚠️ Failed to load recommendations, continuing with normal items:', err);
+        }
+      }
+
+      // Load normal items
       this.itemService.getAllItems(this.sectionId, lat, lng).subscribe({
         next: (data: ItemResponse[]) => {
           console.log(`✅ Items loaded for ${this.sectionId}:`, data.length);
-          
+
           // Get current user ID from localStorage
           const currentUserId = localStorage.getItem('userId');
-          
-          // Filter out user's own items
+
+          // Filter out user's own items and deduplicate with recommendations
           const mappedData: AnnonceData[] = data
             .filter(item => {
               // Hide user's own items from the marketplace
               if (currentUserId && item.ownerId === currentUserId) {
+                return false;
+              }
+              // Deduplicate: exclude items already in recommendations
+              if (recommendedIds.has(item.id)) {
                 return false;
               }
               return true;
@@ -87,8 +130,25 @@ export class AnnonceCards implements OnInit {
               createdAt: item.createdAt,
               expiresAt: item.expiresAt,
               photos: item.photos ?? [],
+              // ✅ Check service (survives navigation) instead of local Set
+              isRecommended: this.recommendationsService.wasRecommended(item.id),
             }));
-          this.annonces.set(mappedData);
+
+          // Merge: recommendations first, then normal items
+          let finalList = [...recommendedItems, ...mappedData];
+          
+          // ✅ Sort to ensure ALL recommended items appear first (handles navigation returns)
+          if (this.sectionId === 'for-you') {
+            finalList = finalList.sort((a, b) => {
+              // Recommended items first
+              if (a.isRecommended && !b.isRecommended) return -1;
+              if (!a.isRecommended && b.isRecommended) return 1;
+              // Preserve original order within each group
+              return 0;
+            });
+          }
+          
+          this.annonces.set(finalList);
           this.isLoading.set(false);
         },
         error: (err: any) => {
@@ -136,7 +196,7 @@ export class AnnonceCards implements OnInit {
     if (!raw) {
       return '/logo.svg';
     }
-    // Évite d’afficher des URLs manifestement invalides (copier-coller d’erreur, etc.)
+    // Évite d'afficher des URLs manifestement invalides (copier-coller d'erreur, etc.)
     if (
       raw.length > 2048 ||
       /node_modules|react-dom|createFiber|localhost:\d{4}\/error/i.test(raw)
@@ -243,7 +303,6 @@ export class AnnonceCards implements OnInit {
 
   openAnnonce(annonce: AnnonceData): void {
     const id = String(annonce.id);
-    const segment = this.slugService.generateSlug(annonce.title || 'item', id);
-    this.router.navigate(['/annonce', segment]);
+    this.router.navigate(['/annonce', id]);
   }
 }

@@ -4,10 +4,10 @@ import { NavBar } from '../../components/nav-bar/nav-bar';
 import { Banner } from '../../components/banner/banner';
 import { AnnonceCards } from '../../components/annonce-cards/annonce-cards';
 import { Leaderboard } from '../../components/leaderboard/leaderboard';
-import { RecommendedItems } from '../../components/recommended-items/recommended-items';
+
 @Component({
   selector: 'app-acceuil',
-  imports: [NavBar, Banner, AnnonceCards, Leaderboard, RecommendedItems, RouterLink],
+  imports: [NavBar, Banner, AnnonceCards, Leaderboard, RouterLink],
   templateUrl: './acceuil.html',
   styleUrl: './acceuil.scss',
 })

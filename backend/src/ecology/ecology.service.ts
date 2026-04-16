@@ -162,7 +162,7 @@ export class EcologyService {
    * Compute impact for a transaction
    */
   private async computeTransactionImpact(transaction: any): Promise<TransactionImpact> {
-    const category = transaction.items.category || 'OTHER';
+    const category = (transaction.items.category || 'OTHER').toUpperCase();
     
     // Get ecology factors
     const factors = await this.prisma.ecology_factors.findUnique({

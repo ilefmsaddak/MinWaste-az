@@ -45,7 +45,11 @@ export class NotificationsService {
         type: 'PICKUP_CONFIRMED',
         title,
         body,
-        payload: { kind: 'TRANSACTION_COMPLETED' } as any,
+        payload: { 
+          kind: 'TRANSACTION_COMPLETED',
+          page: 'transactions',
+          tab: 'purchases'
+        } as any,
       } as any,
     });
   }
@@ -94,7 +98,11 @@ export class NotificationsService {
         type: 'BADGE_EARNED',
         title: '🏅 New badge',
         body: `You unlocked: ${badgeName}`,
-        payload: { kind: 'BADGE_EARNED', code: badgeCode } as any,
+        payload: { 
+          kind: 'BADGE_EARNED', 
+          code: badgeCode,
+          page: 'profile'
+        } as any,
       } as any,
     });
   }

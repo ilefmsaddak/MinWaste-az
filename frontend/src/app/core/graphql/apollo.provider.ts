@@ -1,4 +1,4 @@
-﻿import { HttpHeaders } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
 import { ApolloClientOptions, InMemoryCache } from '@apollo/client/core';
 import { setContext } from '@apollo/client/link/context';
 import { inject } from '@angular/core';
@@ -59,6 +59,10 @@ export function apolloOptionsFactory(): ApolloClientOptions {
           fields: {
             myTransactions: {
               // Replace list on refresh/query instead of attempting array merge.
+              merge: false,
+            },
+            myNotifications: {
+              // Replace list instead of merging (avoids cache data loss warning)
               merge: false,
             },
           },

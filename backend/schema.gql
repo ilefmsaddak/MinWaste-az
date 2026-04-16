@@ -114,6 +114,7 @@ type NotificationGql {
   title: String
   body: String!
   isRead: Boolean!
+  payload: String
   createdAt: DateTime!
 }
 
