@@ -52,10 +52,10 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
-  const port = process.env.PORT ?? 4000;
-  await app.listen(port);
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
   console.log(
-    `🚀 MinWaste merged API — http://localhost:${port}/graphql  ·  chat REST /chat  ·  WS /messages`,
+    `🚀 MinWaste merged API running on port ${port} (0.0.0.0)`,
   );
 }
 bootstrap();

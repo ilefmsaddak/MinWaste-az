@@ -1,4 +1,4 @@
-const DEFAULT_API_URL = 'http://localhost:4000/api';
+const DEFAULT_API_URL = 'http://localhost:3000/api';
 
 function getApiBaseUrl(): string {
   if (typeof window === 'undefined') {

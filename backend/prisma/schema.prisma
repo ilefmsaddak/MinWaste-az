@@ -8,7 +8,7 @@ datasource db {
 }
 
 model badges {
-  id          String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id          String        @id @default(uuid()) @db.Uuid
   code        String        @unique
   name        String
   description String?
@@ -19,7 +19,7 @@ model badges {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model conversations {
-  id                                  String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                                  String     @id @default(uuid()) @db.Uuid
   /// Optional: null = direct message thread (no listing), per Tessnime-style chat
   item_id                             String?    @db.Uuid
   user1_id                            String     @db.Uuid
@@ -36,7 +36,7 @@ model conversations {
 }
 
 model ecology_factors {
-  id                       String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                       String   @id @default(uuid()) @db.Uuid
   category                 String   @unique
   default_weight_kg        Decimal  @db.Decimal(8, 3)
   co2_factor_kg_per_kg     Decimal  @db.Decimal(8, 3)
@@ -47,7 +47,7 @@ model ecology_factors {
 }
 
 model events {
-  id         String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id         String     @id @default(uuid()) @db.Uuid
   user_id    String     @db.Uuid
   type       event_type
   meta       Json?
@@ -69,7 +69,7 @@ model favorites {
 }
 
 model item_photos {
-  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
   item_id    String   @db.Uuid
   url        String
   position   Int      @default(0) @db.SmallInt
@@ -95,7 +95,7 @@ model item_views {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model items {
-  id                  String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                  String                @id @default(uuid()) @db.Uuid
   owner_id            String                @db.Uuid
   type                item_type
   title               String
@@ -132,7 +132,7 @@ model items {
 }
 
 model messages {
-  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id              String        @id @default(uuid()) @db.Uuid
   conversation_id String        @db.Uuid
   sender_id       String        @db.Uuid
   content         String
@@ -146,7 +146,7 @@ model messages {
 }
 
 model monthly_reports {
-  id                     String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                     String   @id @default(uuid()) @db.Uuid
   month                  Int      @db.SmallInt
   year                   Int      @db.SmallInt
   total_co2_saved_kg     Decimal  @db.Decimal(12, 3)
@@ -165,7 +165,7 @@ model monthly_reports {
 }
 
 model notifications {
-  id          String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id          String     @id @default(uuid()) @db.Uuid
   receiver_id String     @db.Uuid
   type        notif_type
   title       String?
@@ -180,7 +180,7 @@ model notifications {
 }
 
 model points_ledger {
-  id              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id              String   @id @default(uuid()) @db.Uuid
   user_id         String   @db.Uuid
   delta           Int
   balance_after   Int
@@ -196,7 +196,7 @@ model points_ledger {
 }
 
 model reports {
-  id          String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id          String        @id @default(uuid()) @db.Uuid
   item_id     String        @db.Uuid
   reporter_id String        @db.Uuid
   reason      String
@@ -211,7 +211,7 @@ model reports {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model reviews {
-  id                               String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                               String       @id @default(uuid()) @db.Uuid
   transaction_id                   String       @unique @db.Uuid
   reviewed_id                      String       @db.Uuid
   reviewer_id                      String       @db.Uuid
@@ -226,7 +226,7 @@ model reviews {
 }
 
 model transaction_impacts {
-  id                                           String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                                           String       @id @default(uuid()) @db.Uuid
   transaction_id                               String       @unique @db.Uuid
   item_id                                      String       @db.Uuid
   owner_id                                     String       @db.Uuid
@@ -256,7 +256,7 @@ model transaction_impacts {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model transactions {
-  id                                    String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                                    String               @id @default(uuid()) @db.Uuid
   item_id                               String               @db.Uuid
   owner_id                              String               @db.Uuid
   receiver_id                           String               @db.Uuid
@@ -324,7 +324,7 @@ model user_profiles {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model users {
-  id                                                         String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                                                         String                @id @default(uuid()) @db.Uuid
   email                                                      String                @unique
   display_name                                               String
   phone                                                      String?

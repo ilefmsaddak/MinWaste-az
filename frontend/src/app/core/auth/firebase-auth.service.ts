@@ -43,9 +43,9 @@ export class FirebaseAuthService {
       if (!this.authReady$.value) this.authReady$.next(true);
       return;
     }
-    if (cfg.projectId !== 'minwaste-team') {
+    if (cfg.projectId !== 'minwaste-119e9') {
       console.warn(
-        `[Firebase] projectId="${cfg.projectId}" — le backend attend des tokens minwaste-team (FIREBASE_PROJECT_ID).`,
+        `[Firebase] projectId="${cfg.projectId}" — le backend attend des tokens minwaste-119e9 (FIREBASE_PROJECT_ID).`,
       );
     }
     try {

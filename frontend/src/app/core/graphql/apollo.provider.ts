@@ -6,7 +6,7 @@ import { HttpLink } from 'apollo-angular/http';
 import { FirebaseAuthService } from '../auth/firebase-auth.service';
 
 /** Same port as Nest backend (see backend/src/main.ts) */
-const GRAPHQL_URI = 'http://localhost:4000/graphql';
+const GRAPHQL_URI = 'http://localhost:3000/graphql';
 
 function headersToRecord(
   headers: unknown,

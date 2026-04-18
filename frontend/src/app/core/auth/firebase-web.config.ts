@@ -16,7 +16,7 @@ declare global {
 }
 
 /** Doit correspondre à FIREBASE_PROJECT_ID côté Nest. */
-const EXPECTED_PROJECT_ID = 'minwaste-app';
+const EXPECTED_PROJECT_ID = 'minwaste-119e9';
 
 export const firebaseWebAppConfigFallback: FirebaseWebPublicShape = {
   apiKey: '',
