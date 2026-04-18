@@ -1,4 +1,5 @@
-const DEFAULT_API_URL = 'http://localhost:3000/api';
+/** Same port as Nest backend in Docker (see backend/.env) */
+const DEFAULT_API_URL = 'https://minwaste-app.thankfulocean-0d5f73fc.westeurope.azurecontainerapps.io/api';
 
 function getApiBaseUrl(): string {
   if (typeof window === 'undefined') {

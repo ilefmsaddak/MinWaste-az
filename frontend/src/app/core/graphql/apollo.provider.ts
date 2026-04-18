@@ -5,8 +5,8 @@ import { inject } from '@angular/core';
 import { HttpLink } from 'apollo-angular/http';
 import { FirebaseAuthService } from '../auth/firebase-auth.service';
 
-/** Same port as Nest backend (see backend/src/main.ts) */
-const GRAPHQL_URI = 'http://localhost:3000/graphql';
+/** Same port as Nest backend in Docker (see backend/.env) */
+const GRAPHQL_URI = 'https://minwaste-app.thankfulocean-0d5f73fc.westeurope.azurecontainerapps.io/graphql';
 
 function headersToRecord(
   headers: unknown,
